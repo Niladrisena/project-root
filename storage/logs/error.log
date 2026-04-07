@@ -4746,3 +4746,14 @@ Stack trace: #0 C:\xampp\htdocs\project-root\app\controllers\DashboardController
 #3 {main}
 Thrown in 'C:\xampp\htdocs\project-root\app\views\layouts\main.php' on line 106
 
+[2026-04-07 17:27:39] Uncaught Exception: 'PDOException'
+Message: 'SQLSTATE[HY093]: Invalid parameter number'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Database.php(51): PDOStatement->execute()
+#1 C:\xampp\htdocs\project-root\core\Database.php(55): Database->execute()
+#2 C:\xampp\htdocs\project-root\app\models\User.php(296): Database->fetchAll()
+#3 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(49): User->getRoleAllocationMembers(Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->roleManagement()
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\core\Database.php' on line 51
+

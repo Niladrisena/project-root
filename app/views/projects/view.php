@@ -15,8 +15,22 @@
             'mechanical' => ['icon_bg' => 'bg-emerald-500', 'emoji' => '⚙'],
             'electrical' => ['icon_bg' => 'bg-amber-500', 'emoji' => '⚡'],
             'architecture' => ['icon_bg' => 'bg-blue-500', 'emoji' => '🏛'],
+            'structural' => ['icon_bg' => 'bg-rose-500', 'emoji' => '🏗'],
         ];
         $experienceOptions = ['1-2 yrs', '2-4 yrs', '3-5 yrs', '4+ yrs', '5+ yrs'];
+        $hourPlan = $hourPlan ?? [];
+        $hourPlanRows = $hourPlan['rows'] ?? [];
+        $planningMonth = $hourPlan['planning_month'] ?? date('F Y');
+        $planningMonthValue = '';
+        if (!empty($planningMonth)) {
+            $planningTimestamp = strtotime($planningMonth);
+            if ($planningTimestamp !== false) {
+                $planningMonthValue = date('Y-m', $planningTimestamp);
+            }
+        }
+        if ($planningMonthValue === '') {
+            $planningMonthValue = date('Y-m');
+        }
     ?>
 
     <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -396,10 +410,146 @@
     </div>
 
     <div id="tab-hour" class="tab-content hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-10 text-center">
-            <h3 class="text-2xl font-black text-gray-900">Hour Planning</h3>
-            <p class="mt-3 text-sm text-gray-500">This project tab is ready for planned hours, utilization, and capacity scheduling.</p>
-        </div>
+        <form method="POST" action="<?= base_url('/project/save_hour_plan/' . $project['id']) ?>" id="hour-plan-form" class="bg-white rounded-[28px] border border-gray-200 shadow-sm overflow-hidden">
+            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+            <input type="hidden" name="plan_action" id="hour-plan-action" value="draft">
+
+            <div class="px-8 py-6 border-b border-gray-100 flex flex-col gap-4">
+                <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-2xl border border-blue-100 bg-blue-50 flex items-center justify-center shrink-0 text-blue-600">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-[2rem] leading-tight font-black text-slate-900">Hour Planning</h3>
+                            <p class="text-sm text-slate-500 mt-1">Allocate work hours for each department and track estimated versus assigned effort on a weekly basis.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="px-5 py-3 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:bg-gray-50 transition self-start">Export</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Month & Year</label>
+                        <input type="month" name="planning_month" value="<?= sanitize($planningMonthValue) ?>" class="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                    </div>
+                    <div class="xl:col-span-3 flex items-end">
+                        <p class="text-sm text-slate-400 font-medium">Select the planning month to update this project&apos;s hour allocation and monthly totals.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-8 pb-8">
+                <div class="rounded-[24px] border border-gray-200 overflow-hidden bg-white">
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[1080px]">
+                            <thead class="bg-gray-50 text-slate-500 text-sm">
+                                <tr>
+                                    <th class="px-6 py-5 text-left font-bold">Department</th>
+                                    <th class="px-4 py-5 text-center font-bold">Estimated<br>Hours</th>
+                                    <th class="px-4 py-5 text-center font-bold">Assigned<br>Hours</th>
+                                    <th class="px-4 py-5 text-center font-bold">Week 1<br><span class="font-normal text-xs text-gray-400">Apr 1 - Apr 7</span></th>
+                                    <th class="px-4 py-5 text-center font-bold">Week 2<br><span class="font-normal text-xs text-gray-400">Apr 8 - Apr 14</span></th>
+                                    <th class="px-4 py-5 text-center font-bold">Variance</th>
+                                    <th class="px-4 py-5 text-center font-bold">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hour-plan-rows" class="divide-y divide-gray-100">
+                                <?php foreach ($hourPlanRows as $row): ?>
+                                    <?php
+                                        $departmentKey = strtolower(trim((string) ($row['department'] ?? '')));
+                                        $meta = $departmentMeta[$departmentKey] ?? ['icon_bg' => 'bg-slate-500', 'emoji' => '•'];
+                                        $estimatedHours = (float) ($row['estimated_hours'] ?? 0);
+                                        $assignedHours = (float) ($row['assigned_hours'] ?? 0);
+                                        $week1Hours = (float) ($row['week_1_hours'] ?? 0);
+                                        $week2Hours = (float) ($row['week_2_hours'] ?? 0);
+                                        $varianceHours = $assignedHours - $estimatedHours;
+                                        $totalHours = $week1Hours + $week2Hours;
+                                    ?>
+                                    <tr class="hour-plan-row">
+                                        <td class="px-6 py-5">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-11 h-11 rounded-full <?= $meta['icon_bg'] ?> text-white flex items-center justify-center text-lg font-black shrink-0"><?= $meta['emoji'] ?></div>
+                                                <input type="text" name="department[]" value="<?= sanitize($row['department']) ?>" class="w-full max-w-[220px] bg-transparent text-[1.05rem] font-black text-slate-900 focus:outline-none">
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-5 text-center">
+                                            <input type="number" step="0.5" min="0" name="estimated_hours[]" value="<?= number_format($estimatedHours, 1, '.', '') ?>" class="hour-estimated h-11 w-[90px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                                        </td>
+                                        <td class="px-4 py-5 text-center">
+                                            <input type="number" step="0.5" min="0" name="assigned_hours[]" value="<?= number_format($assignedHours, 1, '.', '') ?>" class="hour-assigned h-11 w-[90px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                                        </td>
+                                        <td class="px-4 py-5 text-center">
+                                            <input type="number" step="0.5" min="0" name="week_1_hours[]" value="<?= number_format($week1Hours, 1, '.', '') ?>" class="hour-week1 h-11 w-[90px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                                        </td>
+                                        <td class="px-4 py-5 text-center">
+                                            <input type="number" step="0.5" min="0" name="week_2_hours[]" value="<?= number_format($week2Hours, 1, '.', '') ?>" class="hour-week2 h-11 w-[90px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                                        </td>
+                                        <td class="px-4 py-5 text-center">
+                                            <span class="hour-variance inline-flex items-center justify-center px-3 py-2 rounded-xl text-sm font-bold <?= $varianceHours < 0 ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600' ?>">
+                                                <?= $varianceHours >= 0 ? '+' : '' ?><?= number_format($varianceHours, 1) ?> hrs
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-5 text-center">
+                                            <span class="hour-total text-2xl font-black text-slate-800"><?= number_format($totalHours, 1) ?> hrs</span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                            <tfoot class="bg-gray-50 border-t border-gray-200">
+                                <tr>
+                                    <td class="px-6 py-5 text-lg font-black text-slate-800">Total</td>
+                                    <td class="px-4 py-5 text-center text-2xl font-black text-slate-800"><span id="hour-total-estimated">0</span> hrs</td>
+                                    <td class="px-4 py-5 text-center text-2xl font-black text-slate-800"><span id="hour-total-assigned">0</span> hrs</td>
+                                    <td class="px-4 py-5 text-center text-2xl font-black text-slate-800"><span id="hour-total-week1">0</span> hrs</td>
+                                    <td class="px-4 py-5 text-center text-2xl font-black text-slate-800"><span id="hour-total-week2">0</span> hrs</td>
+                                    <td class="px-4 py-5 text-center text-lg font-black text-red-500"><span id="hour-total-variance">0</span></td>
+                                    <td class="px-4 py-5 text-center text-2xl font-black text-slate-800"><span id="hour-total-hours">0</span> hrs</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="m-4 rounded-2xl bg-[#f7f8ff] border border-blue-100 p-5">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg font-black shrink-0">✓</div>
+                            <div>
+                                <h5 class="text-xl font-black text-slate-900">Summary</h5>
+                                <p class="text-sm text-slate-400">Overview of resource requirement vs allocation.</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                            <div class="bg-white rounded-xl border border-gray-200 px-4 py-4">
+                                <p class="text-sm text-gray-400 font-semibold">Total Estimated</p>
+                                <p id="hour-summary-estimated" class="mt-2 text-4xl font-black text-slate-900">0 hrs</p>
+                            </div>
+                            <div class="bg-white rounded-xl border border-gray-200 px-4 py-4">
+                                <p class="text-sm text-gray-400 font-semibold">Total Assigned</p>
+                                <p id="hour-summary-assigned" class="mt-2 text-4xl font-black text-slate-900">0 hrs</p>
+                            </div>
+                            <div class="bg-white rounded-xl border border-gray-200 px-4 py-4">
+                                <p class="text-sm text-gray-400 font-semibold">Variance</p>
+                                <p id="hour-summary-variance" class="mt-2 text-3xl font-black text-red-500">0 hrs / 0%</p>
+                            </div>
+                            <div class="bg-white rounded-xl border border-gray-200 px-4 py-4">
+                                <p class="text-sm text-gray-400 font-semibold">Utilization</p>
+                                <p id="hour-summary-utilization" class="mt-2 text-3xl font-black text-emerald-600">0%</p>
+                                <div class="mt-3 h-2.5 rounded-full bg-gray-100 overflow-hidden">
+                                    <div id="hour-summary-utilization-bar" class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-green-400" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 flex flex-wrap justify-end gap-3">
+                            <button type="reset" id="hour-plan-cancel" class="px-5 py-3 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:bg-gray-50 transition">Cancel</button>
+                            <button type="submit" onclick="document.getElementById('hour-plan-action').value='submit'" class="px-5 py-3 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition shadow-sm">Submit Plan</button>
+                            <button type="submit" onclick="document.getElementById('hour-plan-action').value='draft'" class="px-5 py-3 rounded-xl border border-blue-100 bg-blue-50 text-sm font-bold text-blue-600 hover:bg-blue-100 transition">Save Draft</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 
     <div id="tab-files" class="tab-content hidden">
@@ -796,6 +946,76 @@
             updateResourceSummary();
             document.getElementById('add-department-btn')?.addEventListener('click', createDepartmentRow);
             document.getElementById('resource-plan-cancel')?.addEventListener('click', () => setTimeout(updateResourceSummary, 0));
+        });
+    })();
+</script>
+<script>
+    (function () {
+        function updateHourSummary() {
+            const rows = document.querySelectorAll('#hour-plan-rows .hour-plan-row');
+            let totalEstimated = 0;
+            let totalAssigned = 0;
+            let totalWeek1 = 0;
+            let totalWeek2 = 0;
+
+            rows.forEach(row => {
+                const estimated = Math.max(0, parseFloat(row.querySelector('.hour-estimated')?.value || '0'));
+                const assigned = Math.max(0, parseFloat(row.querySelector('.hour-assigned')?.value || '0'));
+                const week1 = Math.max(0, parseFloat(row.querySelector('.hour-week1')?.value || '0'));
+                const week2 = Math.max(0, parseFloat(row.querySelector('.hour-week2')?.value || '0'));
+                const variance = assigned - estimated;
+                const total = week1 + week2;
+
+                totalEstimated += estimated;
+                totalAssigned += assigned;
+                totalWeek1 += week1;
+                totalWeek2 += week2;
+
+                const varianceEl = row.querySelector('.hour-variance');
+                const totalEl = row.querySelector('.hour-total');
+                if (varianceEl) {
+                    varianceEl.textContent = `${variance >= 0 ? '+' : ''}${variance.toFixed(1)} hrs`;
+                    varianceEl.classList.toggle('bg-red-50', variance < 0);
+                    varianceEl.classList.toggle('text-red-500', variance < 0);
+                    varianceEl.classList.toggle('bg-emerald-50', variance >= 0);
+                    varianceEl.classList.toggle('text-emerald-600', variance >= 0);
+                }
+                if (totalEl) totalEl.textContent = `${total.toFixed(1)} hrs`;
+            });
+
+            const totalVariance = totalAssigned - totalEstimated;
+            const totalHours = totalWeek1 + totalWeek2;
+            const utilization = totalEstimated > 0 ? (totalAssigned / totalEstimated) * 100 : 0;
+
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            };
+
+            setText('hour-total-estimated', totalEstimated.toFixed(1));
+            setText('hour-total-assigned', totalAssigned.toFixed(1));
+            setText('hour-total-week1', totalWeek1.toFixed(1));
+            setText('hour-total-week2', totalWeek2.toFixed(1));
+            setText('hour-total-variance', `${totalVariance >= 0 ? '+' : ''}${totalVariance.toFixed(1)} hrs`);
+            setText('hour-total-hours', totalHours.toFixed(1));
+            setText('hour-summary-estimated', `${totalEstimated.toFixed(1)} hrs`);
+            setText('hour-summary-assigned', `${totalAssigned.toFixed(1)} hrs`);
+            setText('hour-summary-variance', `${totalVariance >= 0 ? '+' : ''}${totalVariance.toFixed(1)} hrs / ${utilization && totalEstimated ? ((totalVariance / totalEstimated) * 100).toFixed(1) : '0.0'}%`);
+            setText('hour-summary-utilization', `${utilization.toFixed(1)}%`);
+
+            const utilizationBar = document.getElementById('hour-summary-utilization-bar');
+            if (utilizationBar) utilizationBar.style.width = `${Math.min(100, utilization)}%`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('#hour-plan-rows .hour-plan-row input').forEach(input => {
+                input.addEventListener('input', updateHourSummary);
+            });
+            updateHourSummary();
+
+            document.getElementById('hour-plan-cancel')?.addEventListener('click', function () {
+                setTimeout(updateHourSummary, 0);
+            });
         });
     })();
 </script>

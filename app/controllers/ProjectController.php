@@ -252,6 +252,7 @@ class ProjectController extends Controller {
             'completed_tasks' => array_sum(array_map(fn($member) => (int) ($member['completed_tasks'] ?? 0), $resources)),
         ];
         $resourcePlan = $this->projectModel->getResourcePlan($id, $project, $resources);
+        $hourPlan = $this->projectModel->getHourPlan($id, $project, $resourcePlan);
 
         $this->view('layouts/main', [
             'view_content' => 'projects/view',
@@ -261,6 +262,7 @@ class ProjectController extends Controller {
             'files'        => $files,
             'resources'    => $resources,
             'resourcePlan' => $resourcePlan,
+            'hourPlan'     => $hourPlan,
             'resourceSummary' => $resourceSummary,
             'active_tab'   => $_GET['tab'] ?? 'overview',
             'title'        => 'Project Dashboard: ' . sanitize($project['name']),
@@ -329,6 +331,71 @@ class ProjectController extends Controller {
         }
 
         $this->redirect('/project/show/' . $id . '?tab=resources');
+    }
+
+    public function save_hour_plan($id) {
+        PermissionMiddleware::handle('view', 'projects');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/project/show/' . $id . '?tab=hour');
+        }
+
+        csrf_verify($_POST['csrf_token'] ?? '');
+
+        $project = $this->projectModel->findById($id);
+        if (!$project) {
+            Session::set('flash_error', 'Project not found.');
+            $this->redirect('/project');
+        }
+
+        $departments = $_POST['department'] ?? [];
+        $estimated = $_POST['estimated_hours'] ?? [];
+        $assigned = $_POST['assigned_hours'] ?? [];
+        $week1 = $_POST['week_1_hours'] ?? [];
+        $week2 = $_POST['week_2_hours'] ?? [];
+        $rows = [];
+
+        foreach ($departments as $index => $department) {
+            $department = sanitize(trim((string) $department));
+            if ($department === '') {
+                continue;
+            }
+
+            $rows[] = [
+                'department' => $department,
+                'estimated_hours' => max(0, (float) ($estimated[$index] ?? 0)),
+                'assigned_hours' => max(0, (float) ($assigned[$index] ?? 0)),
+                'week_1_hours' => max(0, (float) ($week1[$index] ?? 0)),
+                'week_2_hours' => max(0, (float) ($week2[$index] ?? 0)),
+            ];
+        }
+
+        if (empty($rows)) {
+            Session::set('flash_error', 'Add at least one department row before saving the hour plan.');
+            $this->redirect('/project/show/' . $id . '?tab=hour');
+        }
+
+        $planningMonthInput = trim((string) ($_POST['planning_month'] ?? ''));
+        $planningMonth = $planningMonthInput !== '' ? date('F Y', strtotime($planningMonthInput . '-01')) : date('F Y');
+
+        $header = [
+            'planning_month' => $planningMonth,
+            'comparison_month' => $planningMonth,
+            'plan_status' => ($_POST['plan_action'] ?? 'draft') === 'submit' ? 'submitted' : 'draft',
+        ];
+
+        $saved = $this->projectModel->saveHourPlan($id, $header, $rows, Session::get('user_id'));
+
+        if ($saved) {
+            Session::set('flash_success', $header['plan_status'] === 'submitted'
+                ? 'Hour plan submitted successfully.'
+                : 'Hour plan saved as draft.'
+            );
+        } else {
+            Session::set('flash_error', 'Unable to save the hour plan right now.');
+        }
+
+        $this->redirect('/project/show/' . $id . '?tab=hour');
     }
 
     public function upload() {

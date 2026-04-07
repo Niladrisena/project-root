@@ -47,6 +47,49 @@ class Project extends Model {
         }
     }
 
+    private function ensureHourPlanningTables() {
+        try {
+            $this->db->query("
+                CREATE TABLE IF NOT EXISTS project_hour_plans (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    project_id INT NOT NULL,
+                    planning_month VARCHAR(20) NOT NULL,
+                    comparison_month VARCHAR(20) NOT NULL,
+                    plan_status VARCHAR(50) NOT NULL DEFAULT 'draft',
+                    updated_by INT NULL,
+                    submitted_at DATETIME NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    UNIQUE KEY unique_project_hour_plan (project_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+            ");
+            $this->db->execute();
+        } catch (Exception $e) {
+            // Table may already exist
+        }
+
+        try {
+            $this->db->query("
+                CREATE TABLE IF NOT EXISTS project_hour_plan_rows (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    plan_id INT NOT NULL,
+                    department VARCHAR(255) NOT NULL,
+                    estimated_hours DECIMAL(10,2) NOT NULL DEFAULT 0,
+                    assigned_hours DECIMAL(10,2) NOT NULL DEFAULT 0,
+                    week_1_hours DECIMAL(10,2) NOT NULL DEFAULT 0,
+                    week_2_hours DECIMAL(10,2) NOT NULL DEFAULT 0,
+                    display_order INT NOT NULL DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    KEY idx_hour_plan_id (plan_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+            ");
+            $this->db->execute();
+        } catch (Exception $e) {
+            // Table may already exist
+        }
+    }
+
     /**
      * ==========================================
      * ENTERPRISE RESOURCE UPGRADE (AUTO-HEALER)
@@ -350,6 +393,120 @@ class Project extends Model {
         }
     }
 
+    public function getHourPlan($project_id, $project = [], $resourcePlan = []) {
+        $this->ensureHourPlanningTables();
+
+        $defaultPlan = [
+            'planning_month' => date('F Y'),
+            'comparison_month' => date('F Y'),
+            'plan_status' => 'draft',
+            'rows' => $this->buildDefaultHourPlanRows($project, $resourcePlan),
+        ];
+
+        try {
+            $this->db->query("SELECT * FROM project_hour_plans WHERE project_id = :project_id LIMIT 1");
+            $this->db->bind(':project_id', $project_id);
+            $plan = $this->db->fetch();
+
+            if (empty($plan)) {
+                return $defaultPlan;
+            }
+
+            $this->db->query("
+                SELECT department, estimated_hours, assigned_hours, week_1_hours, week_2_hours, display_order
+                FROM project_hour_plan_rows
+                WHERE plan_id = :plan_id
+                ORDER BY display_order ASC, id ASC
+            ");
+            $this->db->bind(':plan_id', $plan['id']);
+            $rows = $this->db->fetchAll();
+
+            return [
+                'planning_month' => $plan['planning_month'] ?: $defaultPlan['planning_month'],
+                'comparison_month' => $plan['comparison_month'] ?: $defaultPlan['comparison_month'],
+                'plan_status' => $plan['plan_status'] ?: 'draft',
+                'rows' => !empty($rows) ? $rows : $defaultPlan['rows'],
+            ];
+        } catch (Exception $e) {
+            return $defaultPlan;
+        }
+    }
+
+    public function saveHourPlan($project_id, $header, $rows, $updated_by) {
+        $this->ensureHourPlanningTables();
+        $this->db->beginTransaction();
+
+        try {
+            $this->db->query("SELECT id FROM project_hour_plans WHERE project_id = :project_id LIMIT 1");
+            $this->db->bind(':project_id', $project_id);
+            $existing = $this->db->fetch();
+
+            $submittedAt = ($header['plan_status'] ?? 'draft') === 'submitted' ? date('Y-m-d H:i:s') : null;
+
+            if (!empty($existing['id'])) {
+                $planId = (int) $existing['id'];
+                $this->db->query("
+                    UPDATE project_hour_plans
+                    SET planning_month = :planning_month,
+                        comparison_month = :comparison_month,
+                        plan_status = :plan_status,
+                        updated_by = :updated_by,
+                        submitted_at = :submitted_at
+                    WHERE id = :id
+                ");
+                $this->db->bind(':planning_month', $header['planning_month']);
+                $this->db->bind(':comparison_month', $header['comparison_month']);
+                $this->db->bind(':plan_status', $header['plan_status']);
+                $this->db->bind(':updated_by', $updated_by);
+                $this->db->bind(':submitted_at', $submittedAt);
+                $this->db->bind(':id', $planId);
+                $this->db->execute();
+
+                $this->db->query("DELETE FROM project_hour_plan_rows WHERE plan_id = :plan_id");
+                $this->db->bind(':plan_id', $planId);
+                $this->db->execute();
+            } else {
+                $this->db->query("
+                    INSERT INTO project_hour_plans
+                    (project_id, planning_month, comparison_month, plan_status, updated_by, submitted_at)
+                    VALUES
+                    (:project_id, :planning_month, :comparison_month, :plan_status, :updated_by, :submitted_at)
+                ");
+                $this->db->bind(':project_id', $project_id);
+                $this->db->bind(':planning_month', $header['planning_month']);
+                $this->db->bind(':comparison_month', $header['comparison_month']);
+                $this->db->bind(':plan_status', $header['plan_status']);
+                $this->db->bind(':updated_by', $updated_by);
+                $this->db->bind(':submitted_at', $submittedAt);
+                $this->db->execute();
+                $planId = (int) $this->db->lastInsertId();
+            }
+
+            foreach ($rows as $index => $row) {
+                $this->db->query("
+                    INSERT INTO project_hour_plan_rows
+                    (plan_id, department, estimated_hours, assigned_hours, week_1_hours, week_2_hours, display_order)
+                    VALUES
+                    (:plan_id, :department, :estimated_hours, :assigned_hours, :week_1_hours, :week_2_hours, :display_order)
+                ");
+                $this->db->bind(':plan_id', $planId);
+                $this->db->bind(':department', $row['department']);
+                $this->db->bind(':estimated_hours', $row['estimated_hours']);
+                $this->db->bind(':assigned_hours', $row['assigned_hours']);
+                $this->db->bind(':week_1_hours', $row['week_1_hours']);
+                $this->db->bind(':week_2_hours', $row['week_2_hours']);
+                $this->db->bind(':display_order', $index);
+                $this->db->execute();
+            }
+
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            return false;
+        }
+    }
+
     private function buildDefaultResourcePlanRows($resources) {
         $assignedCount = count($resources);
         $defaultRows = [
@@ -377,6 +534,37 @@ class Project extends Model {
         ];
 
         return array_values(array_filter($defaultRows, fn($row) => $row['required_employees'] > 0));
+    }
+
+    private function buildDefaultHourPlanRows($project, $resourcePlan) {
+        $departments = $resourcePlan['rows'] ?? [];
+        if (empty($departments)) {
+            $departments = $this->buildDefaultResourcePlanRows([]);
+        }
+
+        $plannedHours = max(160, (float) ($project['total_hours'] ?? 160));
+        $rowCount = max(1, count($departments));
+        $baseHours = $plannedHours / $rowCount;
+
+        $rows = [];
+        foreach ($departments as $index => $department) {
+            $required = (int) ($department['required_employees'] ?? 1);
+            $assigned = (int) ($department['assigned_employees'] ?? max(1, $required - 1));
+            $estimated = round(max(40, $baseHours + ($required * 8)));
+            $assignedHours = round(max(32, $estimated - max(0, ($required - $assigned) * 4)));
+            $week1 = round($assignedHours * 0.47);
+            $week2 = round($assignedHours * 0.53);
+
+            $rows[] = [
+                'department' => $department['department'] ?? 'Department ' . ($index + 1),
+                'estimated_hours' => $estimated,
+                'assigned_hours' => $assignedHours,
+                'week_1_hours' => $week1,
+                'week_2_hours' => $week2,
+            ];
+        }
+
+        return $rows;
     }
 
     /**
