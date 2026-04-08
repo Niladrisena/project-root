@@ -699,4 +699,114 @@ class Project extends Model {
 
         return $analyzed_projects;
     }
+
+    public function getRevenueProjectsForManager($manager_id) {
+        try {
+            $this->db->query("
+                SELECT p.id, p.name
+                FROM projects p
+                WHERE p.project_manager_id = :pm_id
+                ORDER BY p.name ASC
+            ");
+            $this->db->bind(':pm_id', $manager_id);
+            return $this->db->fetchAll() ?: [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getPmRevenueSnapshot($manager_id, $filters = []) {
+        $selectedProjectId = !empty($filters['project_id']) ? (int) $filters['project_id'] : null;
+        $monthKey = !empty($filters['month']) ? (string) $filters['month'] : date('Y-m');
+        $monthStart = date('Y-m-01', strtotime($monthKey . '-01'));
+        $monthEnd = date('Y-m-t', strtotime($monthStart));
+
+        $summary = [
+            'total_revenue' => 0.0,
+            'monthly_revenue' => 0.0,
+            'pending_payments' => 0.0,
+            'profit' => 0.0,
+            'paid_invoices' => 0,
+            'pending_invoices' => 0,
+            'overdue_invoices' => 0,
+            'collection_health' => 0,
+            'latest_transaction_date' => null,
+        ];
+
+        $transactions = [];
+
+        try {
+            $projectFilterSql = $selectedProjectId ? " AND p.id = :project_id" : "";
+
+            $this->db->query("
+                SELECT
+                    COALESCE(SUM(i.amount), 0) AS total_revenue,
+                    COALESCE(SUM(CASE WHEN DATE(i.created_at) BETWEEN :month_start AND :month_end THEN i.amount ELSE 0 END), 0) AS monthly_revenue,
+                    COALESCE(SUM(CASE WHEN i.status != 'paid' THEN i.amount ELSE 0 END), 0) AS pending_payments,
+                    COALESCE(SUM(CASE WHEN i.status = 'paid' THEN i.amount ELSE 0 END), 0) AS profit,
+                    SUM(CASE WHEN i.status = 'paid' THEN 1 ELSE 0 END) AS paid_invoices,
+                    SUM(CASE WHEN i.status IN ('draft', 'sent') THEN 1 ELSE 0 END) AS pending_invoices,
+                    SUM(CASE WHEN i.status = 'overdue' OR (i.status != 'paid' AND i.due_date < CURDATE()) THEN 1 ELSE 0 END) AS overdue_invoices,
+                    MAX(i.created_at) AS latest_transaction_date
+                FROM invoices i
+                INNER JOIN projects p ON i.project_id = p.id
+                WHERE p.project_manager_id = :pm_id {$projectFilterSql}
+            ");
+            $this->db->bind(':pm_id', $manager_id);
+            if ($selectedProjectId) {
+                $this->db->bind(':project_id', $selectedProjectId);
+            }
+            $this->db->bind(':month_start', $monthStart);
+            $this->db->bind(':month_end', $monthEnd);
+            $row = $this->db->fetch();
+
+            if ($row) {
+                $summary['total_revenue'] = (float) ($row['total_revenue'] ?? 0);
+                $summary['monthly_revenue'] = (float) ($row['monthly_revenue'] ?? 0);
+                $summary['pending_payments'] = (float) ($row['pending_payments'] ?? 0);
+                $summary['profit'] = (float) ($row['profit'] ?? 0);
+                $summary['paid_invoices'] = (int) ($row['paid_invoices'] ?? 0);
+                $summary['pending_invoices'] = (int) ($row['pending_invoices'] ?? 0);
+                $summary['overdue_invoices'] = (int) ($row['overdue_invoices'] ?? 0);
+                $summary['latest_transaction_date'] = $row['latest_transaction_date'] ?? null;
+                $summary['collection_health'] = $summary['total_revenue'] > 0
+                    ? (int) round(($summary['profit'] / $summary['total_revenue']) * 100)
+                    : 0;
+            }
+
+            $this->db->query("
+                SELECT
+                    i.id,
+                    i.invoice_number,
+                    i.amount,
+                    i.status,
+                    i.due_date,
+                    i.created_at,
+                    p.name AS project_name,
+                    c.company_name AS client_name,
+                    curr.symbol AS currency_symbol
+                FROM invoices i
+                INNER JOIN projects p ON i.project_id = p.id
+                LEFT JOIN clients c ON i.client_id = c.id
+                LEFT JOIN currencies curr ON i.currency_id = curr.id
+                WHERE p.project_manager_id = :pm_id {$projectFilterSql}
+                ORDER BY i.created_at DESC, i.id DESC
+                LIMIT 8
+            ");
+            $this->db->bind(':pm_id', $manager_id);
+            if ($selectedProjectId) {
+                $this->db->bind(':project_id', $selectedProjectId);
+            }
+            $transactions = $this->db->fetchAll() ?: [];
+        } catch (Exception $e) {
+            $transactions = [];
+        }
+
+        return [
+            'summary' => $summary,
+            'transactions' => $transactions,
+            'month_start' => $monthStart,
+            'month_end' => $monthEnd,
+        ];
+    }
 }

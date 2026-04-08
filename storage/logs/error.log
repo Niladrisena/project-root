@@ -4757,3 +4757,91 @@ Stack trace: #0 C:\xampp\htdocs\project-root\core\Database.php(51): PDOStatement
 #6 {main}
 Thrown in 'C:\xampp\htdocs\project-root\core\Database.php' on line 51
 
+[2026-04-08 14:32:04] Uncaught Exception: 'ErrorException'
+Message: 'Undefined array key "days_present"'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\finance\payroll.php(45): ErrorHandler::handleError(2, 'Undefined array...', 'C:\\xampp\\htdocs...', 45)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\FinanceController.php(174): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): FinanceController->payroll()
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\finance\payroll.php' on line 45
+
+[2026-04-08 15:44:53] Uncaught Exception: 'mysqli_sql_exception'
+Message: 'Unknown database 'prodigy_db''
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php(8): mysqli->__construct('localhost', 'root', Object(SensitiveParameterValue), 'prodigy_db')
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\PmController.php(117): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): PmController->revenue_management()
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php' on line 8
+
+[2026-04-08 15:44:55] Uncaught Exception: 'mysqli_sql_exception'
+Message: 'Unknown database 'prodigy_db''
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php(8): mysqli->__construct('localhost', 'root', Object(SensitiveParameterValue), 'prodigy_db')
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\PmController.php(117): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): PmController->revenue_management()
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php' on line 8
+
+[2026-04-08 15:44:56] Uncaught Exception: 'mysqli_sql_exception'
+Message: 'Unknown database 'prodigy_db''
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php(8): mysqli->__construct('localhost', 'root', Object(SensitiveParameterValue), 'prodigy_db')
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\PmController.php(117): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): PmController->revenue_management()
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php' on line 8
+
+[2026-04-08 15:44:56] Uncaught Exception: 'mysqli_sql_exception'
+Message: 'Unknown database 'prodigy_db''
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php(8): mysqli->__construct('localhost', 'root', Object(SensitiveParameterValue), 'prodigy_db')
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\PmController.php(117): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): PmController->revenue_management()
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php' on line 8
+
+[2026-04-08 15:44:56] Uncaught Exception: 'mysqli_sql_exception'
+Message: 'Unknown database 'prodigy_db''
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php(8): mysqli->__construct('localhost', 'root', Object(SensitiveParameterValue), 'prodigy_db')
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\PmController.php(117): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): PmController->revenue_management()
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php' on line 8
+
+[2026-04-08 15:44:56] Uncaught Exception: 'mysqli_sql_exception'
+Message: 'Unknown database 'prodigy_db''
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php(8): mysqli->__construct('localhost', 'root', Object(SensitiveParameterValue), 'prodigy_db')
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\PmController.php(117): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): PmController->revenue_management()
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php' on line 8
+
+[2026-04-08 15:44:56] Uncaught Exception: 'mysqli_sql_exception'
+Message: 'Unknown database 'prodigy_db''
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php(8): mysqli->__construct('localhost', 'root', Object(SensitiveParameterValue), 'prodigy_db')
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\PmController.php(117): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): PmController->revenue_management()
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php' on line 8
+

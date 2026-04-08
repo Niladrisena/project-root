@@ -93,7 +93,38 @@ class PmController extends Controller {
     }
 
     public function revenue_management() {
-        $this->renderBlankTab('Revenue Management', 'A blank workspace for future revenue tracking, billing visibility, and project financial summaries.');
+        $this->ensurePmAccess();
+
+        $projectModel = $this->model('Project');
+        $managerId = (int) Session::get('user_id');
+        $selectedMonth = !empty($_GET['month']) ? preg_replace('/[^0-9\-]/', '', (string) $_GET['month']) : date('Y-m');
+        if (!preg_match('/^\d{4}\-\d{2}$/', $selectedMonth)) {
+            $selectedMonth = date('Y-m');
+        }
+
+        $selectedProjectId = !empty($_GET['project_id']) ? (int) $_GET['project_id'] : null;
+        $projects = $projectModel->getRevenueProjectsForManager($managerId);
+        $projectIds = array_map(fn($project) => (int) ($project['id'] ?? 0), $projects);
+        if ($selectedProjectId && !in_array($selectedProjectId, $projectIds, true)) {
+            $selectedProjectId = null;
+        }
+
+        $revenueData = $projectModel->getPmRevenueSnapshot($managerId, [
+            'month' => $selectedMonth,
+            'project_id' => $selectedProjectId
+        ]);
+
+        $this->view('layouts/main', [
+            'view_content' => 'pm/revenue_management',
+            'title' => 'Revenue Management',
+            'revenue_summary' => $revenueData['summary'] ?? [],
+            'revenue_transactions' => $revenueData['transactions'] ?? [],
+            'revenue_projects' => $projects,
+            'selected_month' => $selectedMonth,
+            'selected_project_id' => $selectedProjectId,
+            'month_start' => $revenueData['month_start'] ?? null,
+            'month_end' => $revenueData['month_end'] ?? null,
+        ]);
     }
 
     public function overall_backlog() {
