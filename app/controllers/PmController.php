@@ -81,6 +81,8 @@ class PmController extends Controller {
         $projectModel = $this->model('Project');
         $projects = $projectModel->getAllForUser($user['id'], $user['role_slug']);
 
+       
+
         $this->view('layouts/main', [
             'view_content' => 'projects/index',
             'projects' => $projects,

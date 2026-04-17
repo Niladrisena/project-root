@@ -143,7 +143,7 @@ class Project extends Model {
      */
     public function getAvailableResources() {
         $this->db->query("
-            SELECT id, first_name, last_name, email, role_id 
+            SELECT id, first_name, last_name, email, role_id, status, avatar
             FROM users 
             WHERE status = 'active' AND role_id != 1 
             ORDER BY first_name ASC
@@ -297,6 +297,7 @@ class Project extends Model {
             ");
             $this->db->bind(':plan_id', $plan['id']);
             $rows = $this->db->fetchAll();
+            $rows = $this->mergeMissingDefaultResourceRows($rows, $defaultPlan['rows']);
 
             return [
                 'project_manager_label' => $plan['project_manager_label'] ?: $defaultPlan['project_manager_label'],
@@ -379,7 +380,7 @@ class Project extends Model {
                 $this->db->bind(':department', $row['department']);
                 $this->db->bind(':required_employees', $row['required_employees']);
                 $this->db->bind(':assigned_employees', $row['assigned_employees']);
-                $this->db->bind(':experience_preferred', $row['experience_preferred']);
+                $this->db->bind(':experience_preferred', $row['experience_preferred'] ?? '');
                 $this->db->bind(':notes', $row['notes']);
                 $this->db->bind(':display_order', $index);
                 $this->db->execute();
@@ -531,9 +532,32 @@ class Project extends Model {
                 'experience_preferred' => '4+ yrs',
                 'notes' => 'AutoCAD, 3D Design, BOQ',
             ],
+            [
+                'department' => 'Structural',
+                'required_employees' => max(1, $assignedCount > 0 ? max(1, $assignedCount - 2) : 2),
+                'assigned_employees' => min(2, max(0, $assignedCount - 2)),
+                'experience_preferred' => '3-5 yrs',
+                'notes' => 'Rebar, RCC, Steel Detailing',
+            ],
         ];
 
         return array_values(array_filter($defaultRows, fn($row) => $row['required_employees'] > 0));
+    }
+
+    private function mergeMissingDefaultResourceRows($rows, $defaultRows) {
+        $existing = array_map(
+            fn($row) => strtolower(trim((string) ($row['department'] ?? ''))),
+            $rows
+        );
+
+        foreach ($defaultRows as $defaultRow) {
+            $department = strtolower(trim((string) ($defaultRow['department'] ?? '')));
+            if ($department !== '' && !in_array($department, $existing, true)) {
+                $rows[] = $defaultRow;
+            }
+        }
+
+        return $rows;
     }
 
     private function buildDefaultHourPlanRows($project, $resourcePlan) {

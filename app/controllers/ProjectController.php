@@ -245,6 +245,7 @@ class ProjectController extends Controller {
         $progress   = $this->projectModel->calculateProgress($id);
         $files      = $this->projectModel->getProjectFiles($id);
         $resources  = $this->projectModel->getProjectResources($id);
+        $availableResources = $this->projectModel->getAvailableResources();
         $resourceSummary = [
             'headcount' => count($resources),
             'allocated_hours' => array_sum(array_map(fn($member) => (float) ($member['allocated_hours'] ?? 0), $resources)),
@@ -261,6 +262,7 @@ class ProjectController extends Controller {
             'progress'     => $progress,
             'files'        => $files,
             'resources'    => $resources,
+            'availableResources' => $availableResources,
             'resourcePlan' => $resourcePlan,
             'hourPlan'     => $hourPlan,
             'resourceSummary' => $resourceSummary,
@@ -287,7 +289,6 @@ class ProjectController extends Controller {
         $departments = $_POST['department'] ?? [];
         $required = $_POST['required_employees'] ?? [];
         $assigned = $_POST['assigned_employees'] ?? [];
-        $experience = $_POST['experience_preferred'] ?? [];
         $notes = $_POST['notes'] ?? [];
         $rows = [];
 
@@ -301,7 +302,6 @@ class ProjectController extends Controller {
                 'department' => $department,
                 'required_employees' => max(0, (int) ($required[$index] ?? 0)),
                 'assigned_employees' => max(0, (int) ($assigned[$index] ?? 0)),
-                'experience_preferred' => sanitize(trim((string) ($experience[$index] ?? ''))),
                 'notes' => sanitize(trim((string) ($notes[$index] ?? ''))),
             ];
         }

@@ -17,7 +17,6 @@
             'architecture' => ['icon_bg' => 'bg-blue-500', 'emoji' => '🏛'],
             'structural' => ['icon_bg' => 'bg-rose-500', 'emoji' => '🏗'],
         ];
-        $experienceOptions = ['1-2 yrs', '2-4 yrs', '3-5 yrs', '4+ yrs', '5+ yrs'];
         $hourPlan = $hourPlan ?? [];
         $hourPlanRows = $hourPlan['rows'] ?? [];
         $planningMonth = $hourPlan['planning_month'] ?? date('F Y');
@@ -31,6 +30,7 @@
         if ($planningMonthValue === '') {
             $planningMonthValue = date('Y-m');
         }
+        $availableResources = $availableResources ?? [];
     ?>
 
     <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -292,17 +292,16 @@
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="w-full min-w-[1080px]">
+                        <table class="w-full min-w-[1180px]">
                             <thead class="bg-gray-50 text-gray-400 text-xs">
                                 <tr>
                                     <th class="px-5 py-4 text-left font-bold">Department</th>
                                     <th class="px-3 py-4 text-center font-bold">Required<br>(Employees)</th>
                                     <th class="px-3 py-4 text-center font-bold">Assigned<br>(Employees)</th>
-                                    <th class="px-3 py-4 text-center font-bold">Experience<br>(Preferred)</th>
                                     <th class="px-3 py-4 text-center font-bold">Notes<br>(Optional)</th>
                                     <th class="px-3 py-4 text-center font-bold">Availability</th>
                                     <th class="px-3 py-4 text-center font-bold">Gap</th>
-                                    <th class="px-3 py-4 text-center font-bold"></th>
+                                    <th class="px-3 py-4 text-center font-bold">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="resource-plan-rows" class="divide-y divide-gray-100">
@@ -317,6 +316,7 @@
                                         $availabilityClass = $gapVal > 0
                                             ? 'bg-red-50 text-red-500 border-red-100'
                                             : 'bg-emerald-50 text-emerald-600 border-emerald-100';
+                                        $memberNames = array_filter(array_map('trim', explode(',', (string) ($row['notes'] ?? ''))));
                                     ?>
                                     <tr class="resource-plan-row">
                                         <td class="px-5 py-4">
@@ -332,14 +332,7 @@
                                             <input type="number" min="0" name="assigned_employees[]" value="<?= $assignedVal ?>" class="resource-assigned h-11 w-[76px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200">
                                         </td>
                                         <td class="px-3 py-4 text-center">
-                                            <select name="experience_preferred[]" class="h-11 w-[110px] rounded-xl border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200">
-                                                <?php foreach ($experienceOptions as $option): ?>
-                                                    <option value="<?= $option ?>" <?= ($row['experience_preferred'] ?? '') === $option ? 'selected' : '' ?>><?= $option ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </td>
-                                        <td class="px-3 py-4 text-center">
-                                            <input type="text" name="notes[]" value="<?= sanitize($row['notes'] ?? '') ?>" class="h-11 w-full min-w-[180px] rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+                                            <input type="text" name="notes[]" value="<?= sanitize($row['notes'] ?? '') ?>" class="resource-notes h-11 w-full min-w-[180px] rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-200">
                                         </td>
                                         <td class="px-3 py-4 text-center">
                                             <span class="resource-availability inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-bold <?= $availabilityClass ?>">
@@ -350,8 +343,20 @@
                                         <td class="px-3 py-4 text-center">
                                             <span class="resource-gap text-3xl font-black <?= $gapVal > 0 ? 'text-red-500' : 'text-emerald-500' ?>"><?= $gapVal ?></span>
                                         </td>
-                                        <td class="px-3 py-4 text-center">
-                                            <button type="button" class="remove-department-btn text-gray-400 hover:text-red-500 text-xl leading-none">⋮</button>
+                                        <td class="px-3 py-4 text-center whitespace-nowrap">
+                                            <button type="button" class="assign-member-btn mr-3 inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition" data-department="<?= sanitize($row['department']) ?>">
+                                                <span class="text-lg leading-none">+</span>
+                                                Assign Member
+                                            </button>
+                                            <input type="hidden" class="resource-member-list" value="<?= sanitize(implode(', ', $memberNames)) ?>">
+                                             <!-- Remove Button (NOW OPENS MODAL) -->
+                                    <button type="button"
+                                        class="open-modal-btn inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 transition"
+                                        data-type="remove"
+                                        data-dept="<?= $row['department'] ?>"
+                                    >
+                                        Remove
+                                    </button>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -399,6 +404,63 @@
                 </div>
             </div>
         </form>
+
+        <div id="resource-member-modal" class="hidden fixed inset-0 z-[120] bg-slate-900/45 backdrop-blur-sm p-4">
+            <div class="mx-auto mt-20 w-full max-w-3xl rounded-[26px] bg-white shadow-2xl border border-gray-100 overflow-hidden">
+                <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
+                    <div>
+                        <h3 id="resource-member-modal-title" class="text-2xl font-black text-slate-900">Add Member</h3>
+                    </div>
+                    <button type="button" id="close-resource-member-modal" class="text-3xl leading-none text-gray-400 hover:text-gray-600">&times;</button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 text-slate-500 text-sm">
+                            <tr>
+                                <th class="px-5 py-4 text-left font-bold">Employee Name</th>
+                                <th class="px-4 py-4 text-center font-bold">Current Status</th>
+                                <th class="px-4 py-4 text-center font-bold">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($availableResources as $resource): ?>
+                                <?php
+                                    $resourceName = trim(($resource['first_name'] ?? '') . ' ' . ($resource['last_name'] ?? ''));
+                                    $statusLabel = strtolower((string) ($resource['status'] ?? 'active')) === 'active' ? 'Available' : 'Inactive';
+                                    $statusClass = $statusLabel === 'Available'
+                                        ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                        : 'bg-red-50 text-red-500 border-red-100';
+                                ?>
+                                <tr class="border-t border-gray-100">
+                                    <td class="px-5 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <img src="<?= $resource['avatar'] ?? 'https://ui-avatars.com/api/?name=' . urlencode($resourceName) . '&background=f8fafc&color=334155' ?>" alt="<?= sanitize($resourceName) ?>" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
+                                            <span class="text-lg font-semibold text-slate-800"><?= sanitize($resourceName) ?></span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-4 text-center">
+                                        <span class="inline-flex items-center rounded-xl border px-3 py-2 text-sm font-bold <?= $statusClass ?>"><?= $statusLabel ?></span>
+                                    </td>
+                                    <td class="px-4 py-4 text-center">
+                                        <!-- Assign Button -->
+                                        <button type="button" class="resource-assign-action inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition" data-member-name="<?= sanitize($resourceName) ?>">
+                                            <span class="text-lg leading-none">+</span>
+                                            Assign
+                                        </button>
+                                         <!-- Remove Button -->
+    <button type="button" class="resource-remove-action inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 transition" data-member-name="<?= sanitize($resourceName) ?>">
+            <span class="text-lg leading-none">×</span>
+            Remove
+        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="tab-revenue" class="tab-content hidden">
@@ -875,10 +937,64 @@
             if (allocationBar) allocationBar.style.width = `${Math.min(100, allocation)}%`;
         }
 
+        let activeResourceRow = null;
+
+        function openResourceMemberModal(row) {
+            activeResourceRow = row;
+            const department = row.querySelector('input[name="department[]"]')?.value || 'Department';
+            const title = document.getElementById('resource-member-modal-title');
+            if (title) {
+                title.textContent = `Add Member to ${department} Department`;
+            }
+            document.getElementById('resource-member-modal')?.classList.remove('hidden');
+        }
+
+        function closeResourceMemberModal() {
+            activeResourceRow = null;
+            document.getElementById('resource-member-modal')?.classList.add('hidden');
+        }
+
+        function assignMemberToRow(memberName) {
+            if (!activeResourceRow) return;
+
+            const notesInput = activeResourceRow.querySelector('.resource-notes');
+            const assignedInput = activeResourceRow.querySelector('.resource-assigned');
+            const memberListInput = activeResourceRow.querySelector('.resource-member-list');
+
+            const currentNames = (notesInput?.value || '')
+                .split(',')
+                .map(name => name.trim())
+                .filter(Boolean);
+
+            if (!currentNames.includes(memberName)) {
+                currentNames.push(memberName);
+                if (notesInput) notesInput.value = currentNames.join(', ');
+                if (memberListInput) memberListInput.value = currentNames.join(', ');
+                if (assignedInput) {
+                    assignedInput.value = String(Math.max(0, parseInt(assignedInput.value || '0', 10)) + 1);
+                }
+            }
+
+            updateResourceSummary();
+            closeResourceMemberModal();
+        }
+
+        function styleRemoveDepartmentButton(button) {
+            if (!button) return;
+
+            button.className = 'remove-department-btn inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition';
+            button.innerHTML = '<span class="text-base leading-none">×</span><span>Remove</span>';
+            button.textContent = 'Remove';
+            button.setAttribute('aria-label', 'Remove department');
+        }
+
         function attachRowEvents(row) {
             row.querySelector('.resource-required')?.addEventListener('input', updateResourceSummary);
             row.querySelector('.resource-assigned')?.addEventListener('input', updateResourceSummary);
-            row.querySelector('.remove-department-btn')?.addEventListener('click', () => {
+            row.querySelector('.assign-member-btn')?.addEventListener('click', () => openResourceMemberModal(row));
+            const removeButton = row.querySelector('.remove-department-btn');
+            styleRemoveDepartmentButton(removeButton);
+            removeButton?.addEventListener('click', () => {
                 const rows = document.querySelectorAll('#resource-plan-rows .resource-plan-row');
                 if (rows.length > 1) {
                     row.remove();
@@ -907,16 +1023,7 @@
                     <input type="number" min="0" name="assigned_employees[]" value="0" class="resource-assigned h-11 w-[76px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200">
                 </td>
                 <td class="px-3 py-4 text-center">
-                    <select name="experience_preferred[]" class="h-11 w-[110px] rounded-xl border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200">
-                        <option>1-2 yrs</option>
-                        <option selected>2-4 yrs</option>
-                        <option>3-5 yrs</option>
-                        <option>4+ yrs</option>
-                        <option>5+ yrs</option>
-                    </select>
-                </td>
-                <td class="px-3 py-4 text-center">
-                    <input type="text" name="notes[]" value="" class="h-11 w-full min-w-[180px] rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+                    <input type="text" name="notes[]" value="" class="resource-notes h-11 w-full min-w-[180px] rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-200">
                 </td>
                 <td class="px-3 py-4 text-center">
                     <span class="resource-availability inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-bold bg-red-50 text-red-500 border-red-100">
@@ -927,8 +1034,16 @@
                 <td class="px-3 py-4 text-center">
                     <span class="resource-gap text-3xl font-black text-red-500">1</span>
                 </td>
-                <td class="px-3 py-4 text-center">
-                    <button type="button" class="remove-department-btn text-gray-400 hover:text-red-500 text-xl leading-none">⋮</button>
+                <td class="px-3 py-4 text-center whitespace-nowrap">
+                    <button type="button" class="assign-member-btn mr-3 inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition" data-department="New Department">
+                        <span class="text-lg leading-none">+</span>
+                        Assign Member
+                    </button>
+                    <input type="hidden" class="resource-member-list" value="">
+                    <button type="button" class="remove-department-btn inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        Remove
+                    </button>
                 </td>
             `;
 
@@ -945,6 +1060,15 @@
             updateResourceSummary();
             document.getElementById('add-department-btn')?.addEventListener('click', createDepartmentRow);
             document.getElementById('resource-plan-cancel')?.addEventListener('click', () => setTimeout(updateResourceSummary, 0));
+            document.getElementById('close-resource-member-modal')?.addEventListener('click', closeResourceMemberModal);
+            document.getElementById('resource-member-modal')?.addEventListener('click', event => {
+                if (event.target.id === 'resource-member-modal') {
+                    closeResourceMemberModal();
+                }
+            });
+            document.querySelectorAll('.resource-assign-action').forEach(button => {
+                button.addEventListener('click', () => assignMemberToRow(button.dataset.memberName || ''));
+            });
         });
     })();
 </script>
