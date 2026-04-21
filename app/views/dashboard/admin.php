@@ -140,6 +140,66 @@
         <?php endif; ?>
     </div>
 </div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+    
+    <div class="lg:col-span-2 bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-xl font-extrabold text-gray-900 tracking-tight">Revenue Overview</h2>
+                <p class="text-xs font-bold text-gray-400 uppercase mt-1 tracking-widest">Growth Tracking (6 Months)</p>
+            </div>
+            <div class="bg-gray-50 px-4 py-2 rounded-xl text-xs font-black text-gray-500 border border-gray-100 cursor-pointer hover:bg-gray-100 transition">
+                Next Month ▾
+            </div>
+        </div>
+        <div class="relative h-72 w-full">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col">
+        <div class="mb-6">
+            <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">PROJECT STATUS BREAKDOWN</h2>
+            <p class="text-sm text-gray-400 font-medium mt-1">Instant view of overall project progress</p>
+        </div>
+        
+        <div class="flex-1 flex flex-col items-center justify-center gap-10">
+            <div class="relative h-60 w-60 flex items-center justify-center">
+                <canvas id="statusDoughnutChart"></canvas>
+                <div class="absolute text-center">
+                    <p id="chart-percentage-main" class="text-5xl font-black text-gray-900 leading-none">0%</p>
+                    <p id="chart-status-main" class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mt-2">In Progress</p>
+                </div>
+            </div>
+
+            <div class="w-full space-y-4">
+                <div class="flex items-center justify-between group cursor-default">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200"></span>
+                        <span class="text-xs font-black text-gray-600 uppercase tracking-wider">Completed</span>
+                    </div>
+                    <span class="text-sm font-black text-gray-900"><?= $stats['completed_projects'] ?? 2 ?> Projects</span>
+                </div>
+                
+                <div class="flex items-center justify-between group cursor-default">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full bg-indigo-600 shadow-sm shadow-indigo-200"></span>
+                        <span class="text-xs font-black text-gray-600 uppercase tracking-wider">In Progress</span>
+                    </div>
+                    <span class="text-sm font-black text-gray-900"><?= $stats['in_progress_projects'] ?? 4 ?> Projects</span>
+                </div>
+
+                <div class="flex items-center justify-between group cursor-default">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full bg-rose-500 shadow-sm shadow-rose-200"></span>
+                        <span class="text-xs font-black text-gray-600 uppercase tracking-wider">On Hold</span>
+                    </div>
+                    <span class="text-sm font-black text-gray-900"><?= $stats['on_hold_projects'] ?? 1 ?> Projects</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -197,4 +257,58 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error("Error loading chart data", error);
     }
 });
+// 1. REVENUE CHART CONFIG (Keeping your existing logic)
+    // ... insert your revenue chart fetch logic here ...
+
+    // 2. **PROJECT STATUS DOUGHNUT CHART**
+    const doughnutCtx = document.getElementById('statusDoughnutChart').getContext('2d');
+    
+    const completed = <?= $stats['completed_projects'] ?? 2 ?>;
+    const inProgress = <?= $stats['in_progress_projects'] ?? 4 ?>;
+    const onHold = <?= $stats['on_hold_projects'] ?? 1 ?>;
+    const total = completed + inProgress + onHold;
+
+    // Calculate percentage for the center text
+    const inProgressPercentage = total > 0 ? Math.round((inProgress / total) * 100) : 0;
+    document.getElementById('chart-percentage-main').textContent = `${inProgressPercentage}%`;
+
+    new Chart(doughnutCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'In Progress', 'On Hold'],
+            datasets: [{
+                data: [completed, inProgress, onHold],
+                backgroundColor: [
+                    '#10b981', // emerald-500
+                    '#4f46e5', // indigo-600
+                    '#f43f5e'  // rose-500
+                ],
+                hoverOffset: 20,
+                borderWidth: 0,
+                borderRadius: 4, // Added slight rounding for a modern look
+                spacing: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '78%', // Slightly thinner for the central text space
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleFont: { size: 12, weight: 'bold', family: 'Inter' },
+                    bodyFont: { size: 12, family: 'Inter' },
+                    padding: 12,
+                    displayColors: true,
+                    cornerRadius: 8
+                }
+            },
+            animation: {
+                animateScale: true,
+                duration: 2000
+            }
+        }
+    });
+
 </script>

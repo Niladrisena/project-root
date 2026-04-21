@@ -4845,3 +4845,453 @@ Stack trace: #0 C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php
 #6 {main}
 Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\revenue_management.php' on line 8
 
+[2026-04-09 14:50:12] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $stats'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php(9): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 9)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#5 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#6 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#7 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 9
+
+[2026-04-09 14:50:15] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $stats'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php(9): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 9)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#5 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#6 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#7 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 9
+
+[2026-04-09 14:50:16] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $stats'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php(9): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 9)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#5 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#6 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#7 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 9
+
+[2026-04-09 14:50:16] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $stats'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php(9): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 9)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#5 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#6 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#7 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 9
+
+[2026-04-09 14:50:48] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $stats'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php(9): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 9)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#5 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#6 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#7 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 9
+
+[2026-04-09 14:50:49] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $stats'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php(9): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 9)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#5 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#6 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#7 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 9
+
+[2026-04-09 14:50:49] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $stats'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php(9): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 9)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#5 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#6 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#7 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 9
+
+[2026-04-09 14:50:49] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $stats'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php(9): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 9)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#5 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#6 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#7 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 9
+
+[2026-04-09 15:08:50] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $stats'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php(9): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 9)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#5 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#6 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#7 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 9
+
+[2026-04-09 15:25:03] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "<", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#3 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#4 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#5 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 11
+
+[2026-04-09 15:25:04] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "<", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#3 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#4 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#5 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 11
+
+[2026-04-09 15:25:04] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "<", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#3 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#4 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#5 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 11
+
+[2026-04-09 15:25:04] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "<", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#3 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#4 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#5 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 11
+
+[2026-04-09 15:25:05] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "<", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#3 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#4 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#5 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 11
+
+[2026-04-09 16:26:48] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "<", expecting "]"'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#3 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#4 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#5 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 12
+
+[2026-04-09 16:26:50] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "<", expecting "]"'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#3 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#4 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#5 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 12
+
+[2026-04-09 16:26:51] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "<", expecting "]"'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#3 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#4 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#5 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 12
+
+[2026-04-09 16:26:51] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "<", expecting "]"'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(33): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\app\controllers\AdminpanelController.php(25): AdminpanelController->renderPlaceholder('Analytics & Rep...', 'adminpanel/anal...')
+#3 C:\xampp\htdocs\project-root\core\App.php(44): AdminpanelController->analyticsReporting()
+#4 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#5 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\adminpanel\analytics_reporting.php' on line 12
+
+[2026-04-14 11:27:32] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 144
+
+[2026-04-14 11:27:33] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 144
+
+[2026-04-14 11:39:06] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 273
+
+[2026-04-14 11:39:08] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 273
+
+[2026-04-14 11:43:20] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "else", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 141
+
+[2026-04-14 11:43:22] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "else", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 141
+
+[2026-04-14 11:43:22] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "else", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 141
+
+[2026-04-14 11:43:22] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "else", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 141
+
+[2026-04-14 11:43:25] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "else", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 141
+
+[2026-04-14 11:43:26] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "else", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 141
+
+[2026-04-14 11:43:26] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "else", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 141
+
+[2026-04-14 11:43:27] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "else", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\PmController.php(105): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): PmController->resource_management()
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\pm\resource_management.php' on line 141
+
+[2026-04-17 10:40:47] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $dept'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\projects\view.php(356): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 356)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('7')
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 356
+
+[2026-04-17 10:40:55] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $dept'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\projects\view.php(356): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 356)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('7')
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 356
+
+[2026-04-17 10:41:09] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $dept'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\projects\view.php(356): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 356)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 356
+
+[2026-04-17 10:41:15] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $dept'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\projects\view.php(356): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 356)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('7')
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 356
+
+[2026-04-17 10:42:53] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $dept'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\projects\view.php(351): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 351)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('7')
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 351
+
+[2026-04-17 12:17:49] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "endforeach", expecting "elseif" or "else" or "endif"'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('7')
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 367
+
+[2026-04-17 12:17:55] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "endforeach", expecting "elseif" or "else" or "endif"'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('7')
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 367
+
+[2026-04-17 12:17:55] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "endforeach", expecting "elseif" or "else" or "endif"'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('7')
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 367
+
+[2026-04-20 10:28:33] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $employee'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\projects\view.php(456): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 456)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('7')
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 456
+
+[2026-04-20 11:55:19] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "<", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('8')
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 19
+
+[2026-04-20 11:55:29] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected token "<", expecting end of file'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once()
+#1 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#2 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('8')
+#3 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#4 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 19
+
+[2026-04-20 15:53:35] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $experienceOptions'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\projects\view.php(335): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 335)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('8')
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 335
+
+[2026-04-20 15:53:52] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $experienceOptions'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\projects\view.php(335): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 335)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('8')
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 335
+
+[2026-04-20 15:53:52] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $experienceOptions'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\projects\view.php(335): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 335)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(237): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('8')
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 335
+

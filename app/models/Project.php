@@ -533,7 +533,7 @@ class Project extends Model {
                 'notes' => 'AutoCAD, 3D Design, BOQ',
             ],
             [
-                'department' => 'Structural',
+                'department' => 'Structure',
                 'required_employees' => max(1, $assignedCount > 0 ? max(1, $assignedCount - 2) : 2),
                 'assigned_employees' => min(2, max(0, $assignedCount - 2)),
                 'experience_preferred' => '3-5 yrs',

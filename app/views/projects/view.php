@@ -15,7 +15,7 @@
             'mechanical' => ['icon_bg' => 'bg-emerald-500', 'emoji' => '⚙'],
             'electrical' => ['icon_bg' => 'bg-amber-500', 'emoji' => '⚡'],
             'architecture' => ['icon_bg' => 'bg-blue-500', 'emoji' => '🏛'],
-            'structural' => ['icon_bg' => 'bg-rose-500', 'emoji' => '🏗'],
+            'structure' => ['icon_bg' => 'bg-rose-500', 'emoji' => '🏗'],
         ];
         $hourPlan = $hourPlan ?? [];
         $hourPlanRows = $hourPlan['rows'] ?? [];
@@ -30,7 +30,7 @@
         if ($planningMonthValue === '') {
             $planningMonthValue = date('Y-m');
         }
-        $availableResources = $availableResources ?? [];
+         $availableResources = $availableResources ?? [];
     ?>
 
     <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -302,6 +302,7 @@
                                     <th class="px-3 py-4 text-center font-bold">Availability</th>
                                     <th class="px-3 py-4 text-center font-bold">Gap</th>
                                     <th class="px-3 py-4 text-center font-bold">Action</th>
+                                    <th class="px-3 py-4 text-center font-bold"></th>
                                 </tr>
                             </thead>
                             <tbody id="resource-plan-rows" class="divide-y divide-gray-100">
@@ -316,7 +317,7 @@
                                         $availabilityClass = $gapVal > 0
                                             ? 'bg-red-50 text-red-500 border-red-100'
                                             : 'bg-emerald-50 text-emerald-600 border-emerald-100';
-                                        $memberNames = array_filter(array_map('trim', explode(',', (string) ($row['notes'] ?? ''))));
+                                            $memberNames = array_filter(array_map('trim', explode(',', (string) ($row['notes'] ?? ''))));
                                     ?>
                                     <tr class="resource-plan-row">
                                         <td class="px-5 py-4">
@@ -343,21 +344,18 @@
                                         <td class="px-3 py-4 text-center">
                                             <span class="resource-gap text-3xl font-black <?= $gapVal > 0 ? 'text-red-500' : 'text-emerald-500' ?>"><?= $gapVal ?></span>
                                         </td>
-                                        <td class="px-3 py-4 text-center whitespace-nowrap">
-                                            <button type="button" class="assign-member-btn mr-3 inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition" data-department="<?= sanitize($row['department']) ?>">
+                                         <td class="px-3 py-4 text-center">
+                                            <button type="button" class="assign-member-btn inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition" data-department="<?= sanitize($row['department']) ?>">
                                                 <span class="text-lg leading-none">+</span>
-                                                Assign Member
+                                                Manage Member
                                             </button>
+                                            
+                                                                                        
                                             <input type="hidden" class="resource-member-list" value="<?= sanitize(implode(', ', $memberNames)) ?>">
-                                             <!-- Remove Button (NOW OPENS MODAL) -->
-                                    <button type="button"
-                                        class="open-modal-btn inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 transition"
-                                        data-type="remove"
-                                        data-dept="<?= $row['department'] ?>"
-                                    >
-                                        Remove
-                                    </button>
                                         </td>
+                                        <!-- <td class="px-3 py-4 text-center">
+                                            <button type="button" class="remove-department-btn text-gray-400 hover:text-red-500 text-xl leading-none">⋮</button>
+                                        </td> -->
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -404,19 +402,19 @@
                 </div>
             </div>
         </form>
-
-        <div id="resource-member-modal" class="hidden fixed inset-0 z-[120] bg-slate-900/45 backdrop-blur-sm p-4">
-            <div class="mx-auto mt-20 w-full max-w-3xl rounded-[26px] bg-white shadow-2xl border border-gray-100 overflow-hidden">
-                <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
+        <div id="resource-member-modal" class="hidden fixed inset-0 z-[120] overflow-y-auto bg-slate-900/45 backdrop-blur-sm p-4 sm:p-6">
+            <div class="flex min-h-full items-center justify-center py-6">
+            <div class="w-full max-w-3xl overflow-hidden rounded-[26px] border border-white/70 bg-white/95 shadow-[0_30px_80px_rgba(15,23,42,0.24)] ring-1 ring-slate-200/80 backdrop-blur-xl">
+                <div class="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white/95 px-6 py-5 backdrop-blur">
                     <div>
                         <h3 id="resource-member-modal-title" class="text-2xl font-black text-slate-900">Add Member</h3>
                     </div>
                     <button type="button" id="close-resource-member-modal" class="text-3xl leading-none text-gray-400 hover:text-gray-600">&times;</button>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="max-h-[70vh] overflow-y-auto overflow-x-auto custom-scrollbar bg-gradient-to-b from-white via-white to-slate-50/80">
                     <table class="w-full">
-                        <thead class="bg-gray-50 text-slate-500 text-sm">
+                        <thead class="sticky top-0 z-[5] bg-gray-50/95 text-sm text-slate-500 backdrop-blur">
                             <tr>
                                 <th class="px-5 py-4 text-left font-bold">Employee Name</th>
                                 <th class="px-4 py-4 text-center font-bold">Current Status</th>
@@ -443,16 +441,16 @@
                                         <span class="inline-flex items-center rounded-xl border px-3 py-2 text-sm font-bold <?= $statusClass ?>"><?= $statusLabel ?></span>
                                     </td>
                                     <td class="px-4 py-4 text-center">
-                                        <!-- Assign Button -->
-                                        <button type="button" class="resource-assign-action inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition" data-member-name="<?= sanitize($resourceName) ?>">
-                                            <span class="text-lg leading-none">+</span>
-                                            Assign
-                                        </button>
-                                         <!-- Remove Button -->
-    <button type="button" class="resource-remove-action inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 transition" data-member-name="<?= sanitize($resourceName) ?>">
-            <span class="text-lg leading-none">×</span>
-            Remove
-        </button>
+                                        <div class="flex items-center justify-center gap-3">
+                                            <button type="button" class="resource-assign-action inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition" data-member-name="<?= sanitize($resourceName) ?>">
+                                                <span class="text-lg leading-none">+</span>
+                                                Assign
+                                            </button>
+                                            <button type="button" class="resource-remove-action inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition" data-member-name="<?= sanitize($resourceName) ?>">
+                                                <span class="text-lg leading-none">&times;</span>
+                                                Remove
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -460,15 +458,10 @@
                     </table>
                 </div>
             </div>
+            </div>
         </div>
     </div>
 
-    <div id="tab-revenue" class="tab-content hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-10 text-center">
-            <h3 class="text-2xl font-black text-gray-900">Revenue Management</h3>
-            <p class="mt-3 text-sm text-gray-500">This project tab is ready for budget, invoice, and billing controls.</p>
-        </div>
-    </div>
 
     <div id="tab-hour" class="tab-content hidden">
         <form method="POST" action="<?= base_url('/project/save_hour_plan/' . $project['id']) ?>" id="hour-plan-form" class="bg-white rounded-[28px] border border-gray-200 shadow-sm overflow-hidden">
@@ -947,6 +940,7 @@
                 title.textContent = `Add Member to ${department} Department`;
             }
             document.getElementById('resource-member-modal')?.classList.remove('hidden');
+            syncModalActionButtons();
         }
 
         function closeResourceMemberModal() {
@@ -954,29 +948,81 @@
             document.getElementById('resource-member-modal')?.classList.add('hidden');
         }
 
-        function assignMemberToRow(memberName) {
-            if (!activeResourceRow) return;
+        function getRowMembers(row) {
+            if (!row) return [];
 
-            const notesInput = activeResourceRow.querySelector('.resource-notes');
-            const assignedInput = activeResourceRow.querySelector('.resource-assigned');
-            const memberListInput = activeResourceRow.querySelector('.resource-member-list');
-
-            const currentNames = (notesInput?.value || '')
+            return (row.querySelector('.resource-member-list')?.value || row.querySelector('.resource-notes')?.value || '')
                 .split(',')
                 .map(name => name.trim())
                 .filter(Boolean);
+        }
+
+        function setRowMembers(row, memberNames) {
+            if (!row) return;
+
+            const uniqueNames = [...new Set(memberNames.filter(Boolean))];
+            const joinedNames = uniqueNames.join(', ');
+            const notesInput = row.querySelector('.resource-notes');
+            const memberListInput = row.querySelector('.resource-member-list');
+
+            if (notesInput) notesInput.value = joinedNames;
+            if (memberListInput) memberListInput.value = joinedNames;
+        }
+
+        function syncModalActionButtons() {
+            const assignedMembers = new Set(getRowMembers(activeResourceRow));
+
+            document.querySelectorAll('.resource-assign-action').forEach(button => {
+                const memberName = button.dataset.memberName || '';
+                const isAssigned = assignedMembers.has(memberName);
+                button.disabled = isAssigned;
+                button.classList.toggle('opacity-50', isAssigned);
+                button.classList.toggle('cursor-not-allowed', isAssigned);
+            });
+
+            document.querySelectorAll('.resource-remove-action').forEach(button => {
+                const memberName = button.dataset.memberName || '';
+                const isAssigned = assignedMembers.has(memberName);
+                button.disabled = !isAssigned;
+                button.classList.toggle('opacity-50', !isAssigned);
+                button.classList.toggle('cursor-not-allowed', !isAssigned);
+            });
+        }
+
+        function assignMemberToRow(memberName) {
+            if (!activeResourceRow) return;
+
+            const assignedInput = activeResourceRow.querySelector('.resource-assigned');
+            const currentNames = getRowMembers(activeResourceRow);
 
             if (!currentNames.includes(memberName)) {
                 currentNames.push(memberName);
-                if (notesInput) notesInput.value = currentNames.join(', ');
-                if (memberListInput) memberListInput.value = currentNames.join(', ');
+                setRowMembers(activeResourceRow, currentNames);
                 if (assignedInput) {
                     assignedInput.value = String(Math.max(0, parseInt(assignedInput.value || '0', 10)) + 1);
                 }
             }
 
             updateResourceSummary();
-            closeResourceMemberModal();
+            syncModalActionButtons();
+        }
+
+        function removeMemberFromRow(memberName) {
+            if (!activeResourceRow) return;
+
+            const assignedInput = activeResourceRow.querySelector('.resource-assigned');
+            const currentNames = getRowMembers(activeResourceRow);
+            const nextNames = currentNames.filter(name => name !== memberName);
+
+            if (nextNames.length !== currentNames.length) {
+                setRowMembers(activeResourceRow, nextNames);
+                if (assignedInput) {
+                    assignedInput.value = String(Math.max(0, parseInt(assignedInput.value || '0', 10) - 1));
+                }
+            }
+
+            updateResourceSummary();
+            syncModalActionButtons();
         }
 
         function styleRemoveDepartmentButton(button) {
@@ -1034,16 +1080,15 @@
                 <td class="px-3 py-4 text-center">
                     <span class="resource-gap text-3xl font-black text-red-500">1</span>
                 </td>
-                <td class="px-3 py-4 text-center whitespace-nowrap">
-                    <button type="button" class="assign-member-btn mr-3 inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition" data-department="New Department">
+                <td class="px-3 py-4 text-center">
+                    <button type="button" class="assign-member-btn inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition" data-department="New Department">
                         <span class="text-lg leading-none">+</span>
                         Assign Member
                     </button>
                     <input type="hidden" class="resource-member-list" value="">
-                    <button type="button" class="remove-department-btn inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        Remove
-                    </button>
+                </td>
+                <td class="px-3 py-4 text-center">
+                    <button type="button" class="remove-department-btn text-gray-400 hover:text-red-500 text-xl leading-none">⋮</button>
                 </td>
             `;
 
@@ -1068,6 +1113,9 @@
             });
             document.querySelectorAll('.resource-assign-action').forEach(button => {
                 button.addEventListener('click', () => assignMemberToRow(button.dataset.memberName || ''));
+            });
+            document.querySelectorAll('.resource-remove-action').forEach(button => {
+                button.addEventListener('click', () => removeMemberFromRow(button.dataset.memberName || ''));
             });
         });
     })();
