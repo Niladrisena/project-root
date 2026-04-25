@@ -252,9 +252,15 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Project Manager</label>
-                    <input type="text" name="project_manager_label" value="<?= sanitize($planManagerLabel) ?>" class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200">
-                </div>
+    <label class="block text-sm font-bold text-gray-700 mb-2">Project Manager</label>
+    <input 
+        type="text" 
+        name="project_manager_label" 
+        value="<?= sanitize($planManagerLabel) ?>" 
+        placeholder="Enter Manager Name"
+        class="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition-shadow"
+    >
+</div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Start Date</label>
                     <input type="date" name="start_date" value="<?= !empty($planStartDate) ? date('Y-m-d', strtotime($planStartDate)) : '' ?>" class="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200">
