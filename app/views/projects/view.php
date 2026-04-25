@@ -296,69 +296,76 @@
                             <thead class="bg-gray-50 text-gray-400 text-xs">
                                 <tr>
                                     <th class="px-5 py-4 text-left font-bold">Department</th>
+                                    <th class="px-3 py-4 text-center font-bold">Hours</th>
                                     <th class="px-3 py-4 text-center font-bold">Required<br>(Employees)</th>
                                     <th class="px-3 py-4 text-center font-bold">Assigned<br>(Employees)</th>
-                                    <th class="px-3 py-4 text-center font-bold">Notes<br>(Optional)</th>
+                                    <th class="px-3 py-4 text-center font-bold">Notes</th>
                                     <th class="px-3 py-4 text-center font-bold">Availability</th>
-                                    <th class="px-3 py-4 text-center font-bold">Gap</th>
                                     <th class="px-3 py-4 text-center font-bold">Action</th>
                                     <th class="px-3 py-4 text-center font-bold"></th>
                                 </tr>
                             </thead>
                             <tbody id="resource-plan-rows" class="divide-y divide-gray-100">
-                                <?php foreach ($planRows as $index => $row): ?>
-                                    <?php
-                                        $departmentKey = strtolower(trim((string) ($row['department'] ?? '')));
-                                        $meta = $departmentMeta[$departmentKey] ?? ['icon_bg' => 'bg-slate-500', 'emoji' => '•'];
-                                        $requiredVal = (int) ($row['required_employees'] ?? 0);
-                                        $assignedVal = (int) ($row['assigned_employees'] ?? 0);
-                                        $gapVal = max(0, $requiredVal - $assignedVal);
-                                        $availableText = $gapVal > 0 ? 'Overloaded' : 'Available';
-                                        $availabilityClass = $gapVal > 0
-                                            ? 'bg-red-50 text-red-500 border-red-100'
-                                            : 'bg-emerald-50 text-emerald-600 border-emerald-100';
-                                            $memberNames = array_filter(array_map('trim', explode(',', (string) ($row['notes'] ?? ''))));
-                                    ?>
-                                    <tr class="resource-plan-row">
-                                        <td class="px-5 py-4">
-                                            <div class="flex items-center gap-4">
-                                                <div class="w-11 h-11 rounded-full <?= $meta['icon_bg'] ?> text-white flex items-center justify-center text-lg font-black shrink-0"><?= $meta['emoji'] ?></div>
-                                                <input type="text" name="department[]" value="<?= sanitize($row['department']) ?>" class="w-full max-w-[220px] bg-transparent text-[1.05rem] font-black text-slate-900 focus:outline-none">
-                                            </div>
-                                        </td>
-                                        <td class="px-3 py-4 text-center">
-                                            <input type="number" min="0" name="required_employees[]" value="<?= $requiredVal ?>" class="resource-required h-11 w-[76px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200">
-                                        </td>
-                                        <td class="px-3 py-4 text-center">
-                                            <input type="number" min="0" name="assigned_employees[]" value="<?= $assignedVal ?>" class="resource-assigned h-11 w-[76px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200">
-                                        </td>
-                                        <td class="px-3 py-4 text-center">
-                                            <input type="text" name="notes[]" value="<?= sanitize($row['notes'] ?? '') ?>" class="resource-notes h-11 w-full min-w-[180px] rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-200">
-                                        </td>
-                                        <td class="px-3 py-4 text-center">
-                                            <span class="resource-availability inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-bold <?= $availabilityClass ?>">
-                                                <span class="resource-availability-dot w-2.5 h-2.5 rounded-full <?= $gapVal > 0 ? 'bg-red-500' : 'bg-emerald-500' ?>"></span>
-                                                <span class="resource-availability-text"><?= $availableText ?></span>
-                                            </span>
-                                        </td>
-                                        <td class="px-3 py-4 text-center">
-                                            <span class="resource-gap text-3xl font-black <?= $gapVal > 0 ? 'text-red-500' : 'text-emerald-500' ?>"><?= $gapVal ?></span>
-                                        </td>
-                                         <td class="px-3 py-4 text-center">
-                                            <button type="button" class="assign-member-btn inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition" data-department="<?= sanitize($row['department']) ?>">
-                                                <span class="text-lg leading-none">+</span>
-                                                Manage Member
-                                            </button>
-                                            
-                                                                                        
-                                            <input type="hidden" class="resource-member-list" value="<?= sanitize(implode(', ', $memberNames)) ?>">
-                                        </td>
-                                        <!-- <td class="px-3 py-4 text-center">
-                                            <button type="button" class="remove-department-btn text-gray-400 hover:text-red-500 text-xl leading-none">⋮</button>
-                                        </td> -->
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
+    <?php foreach ($planRows as $index => $row): 
+        // 1. Get the assigned hours from the Hour Planning tab for this specific department
+        // We match by index assuming both tables follow the same department order
+        $assignedHoursByManager = (float)($hourPlanRows[$index]['assigned_hours'] ?? 0);
+        
+        // 2. Calculate suggested employees (Target Hours / 160 hrs capacity)
+        // ceil() ensures we have enough people to cover the fractional hours
+        $suggestedStaff = $assignedHoursByManager > 0 ? ceil($assignedHoursByManager / 160) : 0;
+        
+        $departmentKey = strtolower(trim((string) ($row['department'] ?? '')));
+        $meta = $departmentMeta[$departmentKey] ?? ['icon_bg' => 'bg-slate-500', 'emoji' => '•'];
+        
+        $assignedStaff = (int)($row['assigned_employees'] ?? 0);
+        $isAvailable = $assignedStaff >= $suggestedStaff;
+    ?>
+    <tr class="resource-plan-row" data-dept-hours="<?= $assignedHoursByManager ?>">
+        <td class="px-5 py-4">
+            <div class="flex items-center gap-4">
+                <div class="w-11 h-11 rounded-full <?= $meta['icon_bg'] ?> text-white flex items-center justify-center text-lg font-black shrink-0"><?= $meta['emoji'] ?></div>
+                <input type="text" name="department[]" value="<?= sanitize($row['department']) ?>" class="w-full max-w-[220px] bg-transparent text-[1.05rem] font-black text-slate-900 focus:outline-none" readonly>
+            </div>
+        </td>
+        
+        <td class="px-3 py-4 text-center">
+            <div class="flex flex-col">
+                <span class="text-sm font-black text-blue-600"><?= number_format($assignedHoursByManager, 1) ?></span>
+                <span class="text-[10px] text-gray-400 uppercase font-bold">Planned Hrs</span>
+            </div>
+        </td>
+
+        <td class="px-3 py-4 text-center">
+            <input type="number" name="required_employees[]" value="<?= $suggestedStaff ?>" 
+                   class="resource-required h-11 w-[76px] rounded-xl border-2 border-blue-50 bg-white text-center text-sm font-bold text-gray-700 focus:border-blue-400 outline-none transition-all">
+        </td>
+
+        <td class="px-3 py-4 text-center">
+            <input type="number" name="assigned_employees[]" value="<?= $assignedStaff ?>" 
+                   class="resource-assigned h-11 w-[76px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-indigo-200 outline-none">
+        </td>
+
+        <td class="px-3 py-4 text-center">
+            <input type="text" name="notes[]" value="<?= sanitize($row['notes'] ?? '') ?>" 
+                   class="resource-notes h-11 w-full min-w-[180px] rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-600 focus:ring-2 focus:ring-indigo-200 outline-none">
+        </td>
+
+        <td class="px-3 py-4 text-center">
+            <span class="resource-availability inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-bold <?= $isAvailable ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-red-50 text-red-500 border-red-100' ?>">
+                <span class="resource-availability-dot w-2.5 h-2.5 rounded-full <?= $isAvailable ? 'bg-emerald-500' : 'bg-red-500' ?>"></span>
+                <span class="resource-availability-text"><?= $isAvailable ? 'Available' : 'Understaffed' ?></span>
+            </span>
+        </td>
+
+        <td class="px-3 py-4 text-center">
+            <button type="button" class="assign-member-btn inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition">
+                <span class="text-lg leading-none">+</span> Manage
+            </button>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+</tbody>
                         </table>
                     </div>
 
@@ -421,40 +428,47 @@
                                 <th class="px-4 py-4 text-center font-bold">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php foreach ($availableResources as $resource): ?>
-                                <?php
-                                    $resourceName = trim(($resource['first_name'] ?? '') . ' ' . ($resource['last_name'] ?? ''));
-                                    $statusLabel = strtolower((string) ($resource['status'] ?? 'active')) === 'active' ? 'Available' : 'Inactive';
-                                    $statusClass = $statusLabel === 'Available'
-                                        ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                                        : 'bg-red-50 text-red-500 border-red-100';
-                                ?>
-                                <tr class="border-t border-gray-100">
-                                    <td class="px-5 py-4">
-                                        <div class="flex items-center gap-3">
-                                            <img src="<?= $resource['avatar'] ?? 'https://ui-avatars.com/api/?name=' . urlencode($resourceName) . '&background=f8fafc&color=334155' ?>" alt="<?= sanitize($resourceName) ?>" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
-                                            <span class="text-lg font-semibold text-slate-800"><?= sanitize($resourceName) ?></span>
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-4 text-center">
-                                        <span class="inline-flex items-center rounded-xl border px-3 py-2 text-sm font-bold <?= $statusClass ?>"><?= $statusLabel ?></span>
-                                    </td>
-                                    <td class="px-4 py-4 text-center">
-                                        <div class="flex items-center justify-center gap-3">
-                                            <button type="button" class="resource-assign-action inline-flex items-center gap-2 rounded-xl border border-indigo-200 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition" data-member-name="<?= sanitize($resourceName) ?>">
-                                                <span class="text-lg leading-none">+</span>
-                                                Assign
-                                            </button>
-                                            <button type="button" class="resource-remove-action inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition" data-member-name="<?= sanitize($resourceName) ?>">
-                                                <span class="text-lg leading-none">&times;</span>
-                                                Remove
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
+                        <tbody id="member-modal-body">
+    <?php foreach ($availableResources as $resource): ?>
+        <?php
+            $resourceName = trim(($resource['first_name'] ?? '') . ' ' . ($resource['last_name'] ?? ''));
+            $statusLabel = strtolower((string) ($resource['status'] ?? 'active')) === 'active' ? 'Available' : 'Inactive';
+            $statusClass = $statusLabel === 'Available' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-red-50 text-red-500 border-red-100';
+        ?>
+        <tr class="border-t border-gray-100 hover:bg-slate-50/50 transition-colors" data-employee-name="<?= sanitize($resourceName) ?>">
+            <td class="px-5 py-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://ui-avatars.com/api/?name=<?= urlencode($resourceName) ?>&background=f8fafc&color=334155" class="w-10 h-10 rounded-full border border-gray-200">
+                    <span class="text-sm font-bold text-slate-800"><?= sanitize($resourceName) ?></span>
+                </div>
+            </td>
+            <td class="px-2 py-4">
+                <div class="flex flex-col gap-1">
+                    <label class="text-[10px] font-black text-gray-400 uppercase">Bill Hrs/Day</label>
+                    <input type="number" step="0.5" class="employee-bill-hrs h-9 w-24 rounded-lg border border-gray-200 px-2 text-sm font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-100" value="8.0">
+                </div>
+            </td>
+            <td class="px-2 py-4">
+                <div class="flex flex-col gap-1">
+                    <label class="text-[10px] font-black text-gray-400 uppercase">Duration (Days)</label>
+                    <input type="number" class="employee-days h-9 w-20 rounded-lg border border-gray-200 px-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100" value="1">
+                </div>
+            </td>
+            <td class="px-4 py-4 text-center">
+                <div class="flex items-center justify-center gap-2">
+                    <button type="button" class="resource-assign-action px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-black hover:bg-indigo-700 transition" 
+                            data-member-name="<?= sanitize($resourceName) ?>">
+                        Assign
+                    </button>
+                    <button type="button" class="resource-remove-action px-4 py-2 rounded-xl border border-red-200 text-red-500 text-xs font-black hover:bg-red-50 transition" 
+                            data-member-name="<?= sanitize($resourceName) ?>">
+                        Remove
+                    </button>
+                </div>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+</tbody>
                     </table>
                 </div>
             </div>
@@ -464,147 +478,158 @@
 
 
     <div id="tab-hour" class="tab-content hidden">
-        <form method="POST" action="<?= base_url('/project/save_hour_plan/' . $project['id']) ?>" id="hour-plan-form" class="bg-white rounded-[28px] border border-gray-200 shadow-sm overflow-hidden">
-            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-            <input type="hidden" name="plan_action" id="hour-plan-action" value="draft">
+    <form method="POST" action="<?= base_url('/project/save_hour_plan/' . $project['id']) ?>" id="hour-plan-form" class="bg-white rounded-[28px] border border-gray-200 shadow-sm overflow-hidden">
+        <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+        <input type="hidden" name="plan_action" id="hour-plan-action" value="draft">
 
-            <div class="px-8 py-6 border-b border-gray-100 flex flex-col gap-4">
-                <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-2xl border border-blue-100 bg-blue-50 flex items-center justify-center shrink-0 text-blue-600">
-                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-[2rem] leading-tight font-black text-slate-900">Hour Planning</h3>
-                            <p class="text-sm text-slate-500 mt-1">Allocate work hours for each department and track estimated versus assigned effort on a weekly basis.</p>
-                        </div>
+        <div class="px-8 py-6 border-b border-gray-100 flex flex-col gap-4">
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-2xl border border-blue-100 bg-blue-50 flex items-center justify-center shrink-0 text-blue-600">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <button type="button" class="px-5 py-3 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:bg-gray-50 transition self-start">Export</button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Month & Year</label>
-                        <input type="month" name="planning_month" value="<?= sanitize($planningMonthValue) ?>" class="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                    </div>
-                    <div class="xl:col-span-3 flex items-end">
-                        <p class="text-sm text-slate-400 font-medium">Select the planning month to update this project&apos;s hour allocation and monthly totals.</p>
+                        <h3 class="text-[2rem] leading-tight font-black text-slate-900">Hour Planning</h3>
+                        <p class="text-sm text-slate-500 mt-1">Allocate total project hours across departments and monitor distribution variance.</p>
                     </div>
                 </div>
+                <button type="button" class="px-5 py-3 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:bg-gray-50 transition self-start">Export Data</button>
             </div>
 
-            <div class="px-8 pb-8">
-                <div class="rounded-[24px] border border-gray-200 overflow-hidden bg-white">
-                    <div class="overflow-x-auto">
-                        <table class="w-full min-w-[1080px]">
-                            <thead class="bg-gray-50 text-slate-500 text-sm">
-                                <tr>
-                                    <th class="px-6 py-5 text-left font-bold">Department</th>
-                                    <th class="px-4 py-5 text-center font-bold">Estimated<br>Hours</th>
-                                    <th class="px-4 py-5 text-center font-bold">Assigned<br>Hours</th>
-                                    <th class="px-4 py-5 text-center font-bold">Week 1<br><span class="font-normal text-xs text-gray-400">Apr 1 - Apr 7</span></th>
-                                    <th class="px-4 py-5 text-center font-bold">Week 2<br><span class="font-normal text-xs text-gray-400">Apr 8 - Apr 14</span></th>
-                                    <th class="px-4 py-5 text-center font-bold">Variance</th>
-                                    <th class="px-4 py-5 text-center font-bold">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="hour-plan-rows" class="divide-y divide-gray-100">
-                                <?php foreach ($hourPlanRows as $row): ?>
-                                    <?php
-                                        $departmentKey = strtolower(trim((string) ($row['department'] ?? '')));
-                                        $meta = $departmentMeta[$departmentKey] ?? ['icon_bg' => 'bg-slate-500', 'emoji' => '•'];
-                                        $estimatedHours = (float) ($row['estimated_hours'] ?? 0);
-                                        $assignedHours = (float) ($row['assigned_hours'] ?? 0);
-                                        $week1Hours = (float) ($row['week_1_hours'] ?? 0);
-                                        $week2Hours = (float) ($row['week_2_hours'] ?? 0);
-                                        $varianceHours = $assignedHours - $estimatedHours;
-                                        $totalHours = $week1Hours + $week2Hours;
-                                    ?>
-                                    <tr class="hour-plan-row">
-                                        <td class="px-6 py-5">
-                                            <div class="flex items-center gap-4">
-                                                <div class="w-11 h-11 rounded-full <?= $meta['icon_bg'] ?> text-white flex items-center justify-center text-lg font-black shrink-0"><?= $meta['emoji'] ?></div>
-                                                <input type="text" name="department[]" value="<?= sanitize($row['department']) ?>" class="w-full max-w-[220px] bg-transparent text-[1.05rem] font-black text-slate-900 focus:outline-none">
-                                            </div>
-                                        </td>
-                                        <td class="px-4 py-5 text-center">
-                                            <input type="number" step="0.5" min="0" name="estimated_hours[]" value="<?= number_format($estimatedHours, 1, '.', '') ?>" class="hour-estimated h-11 w-[90px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                                        </td>
-                                        <td class="px-4 py-5 text-center">
-                                            <input type="number" step="0.5" min="0" name="assigned_hours[]" value="<?= number_format($assignedHours, 1, '.', '') ?>" class="hour-assigned h-11 w-[90px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                                        </td>
-                                        <td class="px-4 py-5 text-center">
-                                            <input type="number" step="0.5" min="0" name="week_1_hours[]" value="<?= number_format($week1Hours, 1, '.', '') ?>" class="hour-week1 h-11 w-[90px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                                        </td>
-                                        <td class="px-4 py-5 text-center">
-                                            <input type="number" step="0.5" min="0" name="week_2_hours[]" value="<?= number_format($week2Hours, 1, '.', '') ?>" class="hour-week2 h-11 w-[90px] rounded-xl border border-gray-200 bg-white text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                                        </td>
-                                        <td class="px-4 py-5 text-center">
-                                            <span class="hour-variance inline-flex items-center justify-center px-3 py-2 rounded-xl text-sm font-bold <?= $varianceHours < 0 ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600' ?>">
-                                                <?= $varianceHours >= 0 ? '+' : '' ?><?= number_format($varianceHours, 1) ?> hrs
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-5 text-center">
-                                            <span class="hour-total text-2xl font-black text-slate-800"><?= number_format($totalHours, 1) ?> hrs</span>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                            <tfoot class="bg-gray-50 border-t border-gray-200">
-                                <tr>
-                                    <td class="px-6 py-5 text-lg font-black text-slate-800">Total</td>
-                                    <td class="px-4 py-5 text-center text-2xl font-black text-slate-800"><span id="hour-total-estimated">0</span> hrs</td>
-                                    <td class="px-4 py-5 text-center text-2xl font-black text-slate-800"><span id="hour-total-assigned">0</span> hrs</td>
-                                    <td class="px-4 py-5 text-center text-2xl font-black text-slate-800"><span id="hour-total-week1">0</span> hrs</td>
-                                    <td class="px-4 py-5 text-center text-2xl font-black text-slate-800"><span id="hour-total-week2">0</span> hrs</td>
-                                    <td class="px-4 py-5 text-center text-lg font-black text-red-500"><span id="hour-total-variance">0</span></td>
-                                    <td class="px-4 py-5 text-center text-2xl font-black text-slate-800"><span id="hour-total-hours">0</span> hrs</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-
-                    <div class="m-4 rounded-2xl bg-[#f7f8ff] border border-blue-100 p-5">
-                        <div class="flex items-start gap-3">
-                            <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg font-black shrink-0">✓</div>
-                            <div>
-                                <h5 class="text-xl font-black text-slate-900">Summary</h5>
-                                <p class="text-sm text-slate-400">Overview of resource requirement vs allocation.</p>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                            <div class="bg-white rounded-xl border border-gray-200 px-4 py-4">
-                                <p class="text-sm text-gray-400 font-semibold">Total Estimated</p>
-                                <p id="hour-summary-estimated" class="mt-2 text-4xl font-black text-slate-900">0 hrs</p>
-                            </div>
-                            <div class="bg-white rounded-xl border border-gray-200 px-4 py-4">
-                                <p class="text-sm text-gray-400 font-semibold">Total Assigned</p>
-                                <p id="hour-summary-assigned" class="mt-2 text-4xl font-black text-slate-900">0 hrs</p>
-                            </div>
-                            <div class="bg-white rounded-xl border border-gray-200 px-4 py-4">
-                                <p class="text-sm text-gray-400 font-semibold">Variance</p>
-                                <p id="hour-summary-variance" class="mt-2 text-3xl font-black text-red-500">0 hrs / 0%</p>
-                            </div>
-                            <div class="bg-white rounded-xl border border-gray-200 px-4 py-4">
-                                <p class="text-sm text-gray-400 font-semibold">Utilization</p>
-                                <p id="hour-summary-utilization" class="mt-2 text-3xl font-black text-emerald-600">0%</p>
-                                <div class="mt-3 h-2.5 rounded-full bg-gray-100 overflow-hidden">
-                                    <div id="hour-summary-utilization-bar" class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-green-400" style="width: 0%"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-5 flex flex-wrap justify-end gap-3">
-                            <button type="reset" id="hour-plan-cancel" class="px-5 py-3 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:bg-gray-50 transition">Cancel</button>
-                            <button type="submit" onclick="document.getElementById('hour-plan-action').value='submit'" class="px-5 py-3 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition shadow-sm">Submit Plan</button>
-                            <button type="submit" onclick="document.getElementById('hour-plan-action').value='draft'" class="px-5 py-3 rounded-xl border border-blue-100 bg-blue-50 text-sm font-bold text-blue-600 hover:bg-blue-100 transition">Save Draft</button>
-                        </div>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Planning Period</label>
+                    <input type="month" name="planning_month" value="<?= sanitize($planningMonthValue) ?>" class="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                </div>               
+                <div class="xl:col-span-3 flex items-end">
+                    <p class="text-sm text-slate-400 font-medium italic">Adjust the "Manager Assigned" column to distribute the total project budget.</p>
                 </div>
             </div>
-        </form>
+            <div class="px-8 pt-8">
+    <div class="bg-slate-900 rounded-[22px] p-6 shadow-xl border border-slate-800 flex items-center justify-between overflow-hidden relative">
+        <div class="relative z-10">
+            <p class="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-1">Project Budget</p>
+            <h2 class="text-4xl font-black text-white flex items-baseline gap-2">
+                <?= number_format($project['total_allocated_hours'] ?? 0, 1) ?>
+                <span class="text-lg font-bold text-slate-400 uppercase">Total Hours</span>
+            </h2>
+        </div>
+        
+        <div class="text-right relative z-10">
+            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Distribution Status</p>
+            <div id="top-status-badge" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-black italic">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                Active Distribution
+            </div>
+        </div>
+
+        <div class="absolute -right-4 -bottom-6 opacity-10">
+            <svg class="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
     </div>
+</div>
+        </div>
+
+        <div class="px-8 pb-8">
+            <div class="rounded-[24px] border border-gray-200 overflow-hidden bg-white">
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[800px]">
+                        <thead class="bg-gray-50 text-slate-500 text-sm">
+                            <tr>
+                                <th class="px-6 py-5 text-left font-bold">Department</th>
+                                <th class="px-4 py-5 text-center font-bold">Required Baseline<br><span class="text-[10px] uppercase tracking-wider opacity-60">Estimated</span></th>
+                                <th class="px-4 py-5 text-center font-bold">Manager Allocation<br><span class="text-[10px] uppercase tracking-wider opacity-60">Actual Assigned</span></th>
+                                <th class="px-4 py-5 text-center font-bold">Distribution Variance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hour-plan-rows" class="divide-y divide-gray-100">
+                            <?php foreach ($hourPlanRows as $row): 
+                                $departmentKey = strtolower(trim((string) ($row['department'] ?? '')));
+                                $meta = $departmentMeta[$departmentKey] ?? ['icon_bg' => 'bg-slate-500', 'emoji' => '•'];
+                                $estimatedHours = (float) ($row['estimated_hours'] ?? 0);
+                                $assignedHours = (float) ($row['assigned_hours'] ?? 0);
+                                $varianceHours = $assignedHours - $estimatedHours;
+                            ?>
+                                <tr class="hour-plan-row hover:bg-slate-50/50 transition-colors">
+                                    <td class="px-6 py-5">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-11 h-11 rounded-full <?= $meta['icon_bg'] ?> text-white flex items-center justify-center text-lg font-black shrink-0"><?= $meta['emoji'] ?></div>
+                                            <input type="text" name="department[]" value="<?= sanitize($row['department']) ?>" class="w-full max-w-[220px] bg-transparent text-[1.05rem] font-black text-slate-900 focus:outline-none" readonly>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
+                                        <div class="text-lg font-bold text-slate-400"><?= number_format($estimatedHours, 1) ?> <span class="text-xs font-normal">hrs</span></div>
+                                        <input type="hidden" name="estimated_hours[]" value="<?= $estimatedHours ?>" class="hour-estimated">
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
+                                        <input type="number" step="0.5" min="0" name="assigned_hours[]" value="<?= number_format($assignedHours, 1, '.', '') ?>" class="hour-assigned h-12 w-[110px] rounded-xl border-2 border-blue-50 bg-white text-center text-md font-bold text-blue-700 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all outline-none">
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
+                                        <span class="hour-variance inline-flex items-center justify-center min-w-[90px] px-4 py-2 rounded-xl text-sm font-black <?= $varianceHours < 0 ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600' ?>">
+                                            <?= $varianceHours >= 0 ? '+' : '' ?><?= number_format($varianceHours, 1) ?> hrs
+                                        </span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                        <tfoot class="bg-slate-900 border-t border-gray-200">
+                            <tr>
+                                <td class="px-6 py-6 text-md font-bold text-white uppercase tracking-widest">Total Plan</td>
+                                <td class="px-4 py-6 text-center text-2xl font-black text-slate-300"><span id="hour-total-estimated">0</span> <span class="text-xs font-normal opacity-60">hrs</span></td>
+                                <td class="px-4 py-6 text-center text-3xl font-black text-blue-400"><span id="hour-total-assigned">0</span> <span class="text-xs font-normal opacity-60">hrs</span></td>
+                                <td class="px-4 py-6 text-center text-xl font-black text-white"><span id="hour-total-variance">0</span></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="m-6 rounded-2xl bg-[#f7f8ff] border border-blue-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2"></path></svg>
+                            </div>
+                            <div>
+                                <h5 class="text-xl font-black text-slate-900 tracking-tight">Allocation Summary</h5>
+                                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Real-time Validation</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Budgeted Baseline</p>
+                            <p id="hour-summary-estimated" class="mt-1 text-3xl font-black text-slate-900">0 hrs</p>
+                        </div>
+                        <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Allocation</p>
+                            <p id="hour-summary-assigned" class="mt-1 text-3xl font-black text-blue-600">0 hrs</p>
+                        </div>
+                        <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Plan Utilization</p>
+                            <div class="flex items-end justify-between">
+                                <p id="hour-summary-utilization" class="mt-1 text-3xl font-black text-emerald-600">0%</p>
+                                <p id="hour-summary-variance-label" class="text-xs font-bold text-red-500 mb-1">0 hrs remaining</p>
+                            </div>
+                            <div class="mt-3 h-3 rounded-full bg-slate-100 overflow-hidden">
+                                <div id="hour-summary-utilization-bar" class="h-full rounded-full bg-gradient-to-r from-blue-600 to-emerald-500 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex items-center justify-end gap-4">
+                        <button type="reset" class="px-8 py-4 rounded-xl text-sm font-black text-slate-400 hover:text-slate-600 transition">Discard Changes</button>
+                        <button type="submit" onclick="document.getElementById('hour-plan-action').value='draft'" class="px-8 py-4 rounded-xl border-2 border-blue-100 bg-white text-sm font-black text-blue-600 hover:bg-blue-50 transition">Save as Draft</button>
+                        <button type="submit" onclick="document.getElementById('hour-plan-action').value='submit'" class="px-10 py-4 rounded-xl bg-blue-600 text-white text-sm font-black hover:bg-blue-700 transition shadow-xl shadow-blue-100">Finalize Plan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 
     <div id="tab-files" class="tab-content hidden">
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -889,6 +914,8 @@
             const assigned = Math.max(0, parseInt(assignedInput.value || '0', 10));
             const gap = Math.max(0, required - assigned);
 
+            
+
             gapEl.textContent = gap;
             gapEl.classList.toggle('text-red-500', gap > 0);
             gapEl.classList.toggle('text-emerald-500', gap === 0);
@@ -968,62 +995,120 @@
             if (notesInput) notesInput.value = joinedNames;
             if (memberListInput) memberListInput.value = joinedNames;
         }
+        // Function to calculate currently allocated hours for the active department in the modal
+function getCurrentlyAllocatedHours() {
+    if (!activeResourceRow) return 0;
+    const notesValue = activeResourceRow.querySelector('.resource-notes').value;
+    if (!notesValue) return 0;
+
+    // Regex to find all "Xhrs/Ydays" patterns and sum them up
+    const pattern = /(\d+(?:\.\d+)?)\s*hrs\/\s*(\d+)\s*days/g;
+    let total = 0;
+    let match;
+    while ((match = pattern.exec(notesValue)) !== null) {
+        total += parseFloat(match[1]) * parseInt(match[2]);
+    }
+    return total;
+}
 
         function syncModalActionButtons() {
-            const assignedMembers = new Set(getRowMembers(activeResourceRow));
+    if (!activeResourceRow) return;
+    
+    // Get the limit from the data-dept-hours attribute set in the PHP loop
+    const plannedLimit = parseFloat(activeResourceRow.dataset.deptHours || 0);
+    const currentAllocated = getCurrentlyAllocatedHours();
+    const notesValue = activeResourceRow.querySelector('.resource-notes').value;
 
-            document.querySelectorAll('.resource-assign-action').forEach(button => {
-                const memberName = button.dataset.memberName || '';
-                const isAssigned = assignedMembers.has(memberName);
-                button.disabled = isAssigned;
-                button.classList.toggle('opacity-50', isAssigned);
-                button.classList.toggle('cursor-not-allowed', isAssigned);
-            });
+    document.querySelectorAll('#member-modal-body tr').forEach(row => {
+        const name = row.dataset.employeeName;
+        const assignBtn = row.querySelector('.resource-assign-action');
+        const removeBtn = row.querySelector('.resource-remove-action');
+        
+        // Calculate what this specific assignment would add
+        const inputHrs = parseFloat(row.querySelector('.employee-bill-hrs').value || 0);
+        const inputDays = parseInt(row.querySelector('.employee-days').value || 0);
+        const prospectiveHours = inputHrs * inputDays;
 
-            document.querySelectorAll('.resource-remove-action').forEach(button => {
-                const memberName = button.dataset.memberName || '';
-                const isAssigned = assignedMembers.has(memberName);
-                button.disabled = !isAssigned;
-                button.classList.toggle('opacity-50', !isAssigned);
-                button.classList.toggle('cursor-not-allowed', !isAssigned);
-            });
+        const isAssigned = notesValue.includes(name);
+
+        if (isAssigned) {
+            assignBtn.disabled = true;
+            assignBtn.innerText = 'Assigned';
+            assignBtn.className = "resource-assign-action px-4 py-2 rounded-xl bg-gray-100 text-gray-400 text-xs font-black cursor-not-allowed";
+            removeBtn.classList.remove('hidden');
+        } else {
+            // VALIDATION: Disable if prospective hours + current allocated > planned limit
+            const wouldExceed = (currentAllocated + prospectiveHours) > plannedLimit;
+            
+            assignBtn.disabled = wouldExceed;
+            removeBtn.classList.add('hidden');
+
+            if (wouldExceed) {
+                assignBtn.innerText = 'Limit Exceeded';
+                assignBtn.className = "resource-assign-action px-4 py-2 rounded-xl bg-red-50 text-red-400 text-[10px] font-black cursor-not-allowed border border-red-100";
+            } else {
+                assignBtn.innerText = 'Assign';
+                assignBtn.className = "resource-assign-action px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-black hover:bg-indigo-700 transition shadow-md shadow-indigo-100";
+            }
         }
+    });
+}
 
         function assignMemberToRow(memberName) {
-            if (!activeResourceRow) return;
+    if (!activeResourceRow) return;
 
-            const assignedInput = activeResourceRow.querySelector('.resource-assigned');
-            const currentNames = getRowMembers(activeResourceRow);
+    // Find the row in the modal to get the specific inputs
+    const modalRow = document.querySelector(`tr[data-employee-name="${memberName}"]`);
+    const billHrs = modalRow.querySelector('.employee-bill-hrs').value || '0';
+    const days = modalRow.querySelector('.employee-days').value || '0';
 
-            if (!currentNames.includes(memberName)) {
-                currentNames.push(memberName);
-                setRowMembers(activeResourceRow, currentNames);
-                if (assignedInput) {
-                    assignedInput.value = String(Math.max(0, parseInt(assignedInput.value || '0', 10)) + 1);
-                }
-            }
+    const assignedInput = activeResourceRow.querySelector('.resource-assigned');
+    const notesInput = activeResourceRow.querySelector('.resource-notes');
 
-            updateResourceSummary();
-            syncModalActionButtons();
+    // Create a structured string for the notes field
+    // Format: "John Doe (8hrs/5days)"
+    const entry = `${memberName} (${billHrs}hrs/${days}days)`;
+
+    let currentEntries = notesInput.value ? notesInput.value.split(',').map(s => s.trim()) : [];
+    
+    // Check if employee is already assigned to avoid duplicates
+    const isAlreadyAssigned = currentEntries.some(e => e.startsWith(memberName));
+
+    if (!isAlreadyAssigned) {
+        currentEntries.push(entry);
+        notesInput.value = currentEntries.join(', ');
+        
+        // Increment assigned count
+        if (assignedInput) {
+            assignedInput.value = parseInt(assignedInput.value || '0') + 1;
         }
+    }
+
+    updateResourceSummary();
+    syncModalActionButtons();
+}
 
         function removeMemberFromRow(memberName) {
-            if (!activeResourceRow) return;
+    if (!activeResourceRow) return;
 
-            const assignedInput = activeResourceRow.querySelector('.resource-assigned');
-            const currentNames = getRowMembers(activeResourceRow);
-            const nextNames = currentNames.filter(name => name !== memberName);
+    const assignedInput = activeResourceRow.querySelector('.resource-assigned');
+    const notesInput = activeResourceRow.querySelector('.resource-notes');
 
-            if (nextNames.length !== currentNames.length) {
-                setRowMembers(activeResourceRow, nextNames);
-                if (assignedInput) {
-                    assignedInput.value = String(Math.max(0, parseInt(assignedInput.value || '0', 10) - 1));
-                }
-            }
+    let currentEntries = notesInput.value ? notesInput.value.split(',').map(s => s.trim()) : [];
+    
+    // Filter out the entry that starts with the member's name
+    const nextEntries = currentEntries.filter(e => !e.startsWith(memberName));
 
-            updateResourceSummary();
-            syncModalActionButtons();
+    if (nextEntries.length !== currentEntries.length) {
+        notesInput.value = nextEntries.join(', ');
+        if (assignedInput) {
+            assignedInput.value = Math.max(0, parseInt(assignedInput.value || '0') - 1);
         }
+    }
+
+    updateResourceSummary();
+    syncModalActionButtons();
+}
 
         function styleRemoveDepartmentButton(button) {
             if (!button) return;
@@ -1162,6 +1247,7 @@
                 const el = document.getElementById(id);
                 if (el) el.textContent = value;
             };
+            
 
             setText('hour-total-estimated', totalEstimated.toFixed(1));
             setText('hour-total-assigned', totalAssigned.toFixed(1));
@@ -1187,6 +1273,12 @@
             document.getElementById('hour-plan-cancel')?.addEventListener('click', function () {
                 setTimeout(updateHourSummary, 0);
             });
+            // Add event listeners to inputs so the "Assign" button updates in real-time as user types
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('employee-bill-hrs') || e.target.classList.contains('employee-days')) {
+        syncModalActionButtons();
+    }
+});
         });
     })();
 </script>
