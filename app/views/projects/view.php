@@ -1268,6 +1268,8 @@ function getCurrentlyAllocatedHours() {
 
             const utilizationBar = document.getElementById('hour-summary-utilization-bar');
             if (utilizationBar) utilizationBar.style.width = `${Math.min(100, utilization)}%`;
+
+            
         }
 
         document.addEventListener('DOMContentLoaded', function () {

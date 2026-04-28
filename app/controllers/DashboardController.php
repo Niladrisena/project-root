@@ -24,6 +24,8 @@ class DashboardController extends Controller {
             $data['stats'] = $this->dashboardModel->getAdminStats();
             $data['activities'] = $this->dashboardModel->getRecentActivity(6);
             $data['admin_documents'] = $this->dashboardModel->getRecentAdminDocuments(8);
+            $data['project_status_breakdown'] = $this->dashboardModel->getProjectStatusBreakdown();
+            $data['project_updates'] = $this->dashboardModel->getRecentProjectUpdates(7);
             $data['view_content'] = 'dashboard/admin';
         } else {
             $data['stats'] = $this->dashboardModel->getEmployeeStats($user['id']);
@@ -32,6 +34,22 @@ class DashboardController extends Controller {
 
         $this->view('layouts/main', $data);
     }
+
+    public function chartData() {
+        AuthMiddleware::handle();
+
+        if (!Auth::role('owner') && !Auth::role('admin')) {
+            http_response_code(403);
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'error', 'message' => 'Forbidden']);
+            exit;
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($this->dashboardModel->getChartData());
+        exit;
+    }
+
     public function employee() {
     AuthMiddleware::handle(); 
     $user_id = Session::get('user_id'); 

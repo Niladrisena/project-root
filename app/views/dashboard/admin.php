@@ -1,314 +1,428 @@
+<?php
+$stats = $stats ?? [];
+$projectStatusBreakdown = $project_status_breakdown ?? [];
+$projectUpdates = $project_updates ?? [];
+$activities = $activities ?? [];
+$adminDocuments = $admin_documents ?? [];
+
+$statusOrder = ['completed', 'in_progress', 'on_hold', 'at_risk', 'not_started'];
+$statusBadgeClasses = [
+    'completed' => 'bg-green-100 text-green-700',
+    'in_progress' => 'bg-blue-100 text-blue-700',
+    'on_hold' => 'bg-yellow-100 text-yellow-700',
+    'at_risk' => 'bg-orange-100 text-orange-700',
+    'not_started' => 'bg-red-100 text-red-700',
+];
+$statusLabelMap = [
+    'completed' => 'Completed',
+    'in_progress' => 'In Progress',
+    'on_hold' => 'On Hold',
+    'at_risk' => 'At Risk',
+    'not_started' => 'Not Started',
+];
+
+$chartSeries = [];
+foreach ($statusOrder as $statusKey) {
+    if (!empty($projectStatusBreakdown[$statusKey])) {
+        $chartSeries[] = $projectStatusBreakdown[$statusKey];
+    }
+}
+
+$topStatus = $chartSeries[0] ?? ['label' => 'Projects', 'percentage' => 0];
+foreach ($chartSeries as $seriesItem) {
+    if (($seriesItem['count'] ?? 0) > ($topStatus['count'] ?? 0)) {
+        $topStatus = $seriesItem;
+    }
+}
+
+$chartJson = json_encode(array_values($chartSeries), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+?>
+
 <div class="space-y-6">
     <?php if (Session::get('flash_success')): ?>
-        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-xl shadow-sm">
-            <p class="text-sm text-green-700 font-bold"><?= Session::get('flash_success'); Session::set('flash_success', null); ?></p>
+        <div class="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+            <?= Session::get('flash_success'); Session::set('flash_success', null); ?>
         </div>
     <?php endif; ?>
 
     <?php if (Session::get('flash_error')): ?>
-        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl shadow-sm">
-            <p class="text-sm text-red-700 font-bold"><?= Session::get('flash_error'); Session::set('flash_error', null); ?></p>
+        <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+            <?= Session::get('flash_error'); Session::set('flash_error', null); ?>
         </div>
     <?php endif; ?>
 
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight"><?= defined('SYS_COMPANY_NAME') ? SYS_COMPANY_NAME : 'Master' ?> Dashboard</h1>
-            <p class="text-sm text-gray-500 mt-1">Enterprise overview and system analytics.</p>
+            <h1 class="text-2xl font-black tracking-tight text-gray-900"><?= defined('SYS_COMPANY_NAME') ? SYS_COMPANY_NAME : 'Admin' ?> Dashboard</h1>
+            <p class="mt-1 text-sm font-medium text-gray-500">Enterprise overview and system analytics.</p>
         </div>
-        <div class="text-sm text-gray-500 font-medium">
+        <div class="text-sm font-semibold text-gray-500">
             <?= date('l, F j, Y') ?>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between hover:shadow-md transition-shadow">
-            <div>
-                <p class="text-sm font-medium text-gray-500">Total Revenue</p>
-                <p class="text-2xl font-bold text-gray-900 mt-1"><?= defined('SYS_CURRENCY') ? SYS_CURRENCY : '$' ?><?= number_format($stats['total_revenue'], 2) ?></p>
-            </div>
-            <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center text-green-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between hover:shadow-md transition-shadow">
-            <div>
-                <p class="text-sm font-medium text-gray-500">Active Projects</p>
-                <p class="text-2xl font-bold text-gray-900 mt-1"><?= $stats['active_projects'] ?></p>
-            </div>
-            <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between hover:shadow-md transition-shadow">
-            <div>
-                <p class="text-sm font-medium text-gray-500">Total Employees</p>
-                <p class="text-2xl font-bold text-gray-900 mt-1"><?= $stats['total_employees'] ?></p>
-            </div>
-            <div class="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between hover:shadow-md transition-shadow">
-            <div>
-                <p class="text-sm font-medium text-gray-500">Pending Tasks</p>
-                <p class="text-2xl font-bold text-gray-900 mt-1"><?= $stats['pending_tasks'] ?></p>
-            </div>
-            <div class="w-12 h-12 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-bold text-gray-900 mb-4">Revenue Overview (6 Months)</h2>
-            <div class="relative h-72 w-full">
-                <canvas id="revenueChart"></canvas>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-bold text-gray-900 mb-4">System Activity</h2>
-            <div class="space-y-4">
-                <?php foreach ($activities as $log): ?>
-                <div class="flex gap-3">
-                    <img src="<?= $log['avatar'] ?? 'https://ui-avatars.com/api/?name='.urlencode($log['first_name']) ?>" class="w-8 h-8 rounded-full">
-                    <div>
-                        <p class="text-sm text-gray-800"><span class="font-semibold"><?= sanitize($log['first_name'] . ' ' . $log['last_name']) ?></span> <?= sanitize($log['action']) ?></p>
-                        <p class="text-xs text-gray-500"><?= date('M d, g:i A', strtotime($log['created_at'])) ?> &middot; <?= sanitize($log['module']) ?></p>
-                    </div>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">Total Revenue</p>
+                    <p class="mt-2 text-3xl font-black text-gray-900"><?= defined('SYS_CURRENCY') ? SYS_CURRENCY : '$' ?><?= number_format((float) ($stats['total_revenue'] ?? 0), 2) ?></p>
                 </div>
-                <?php endforeach; ?>
+                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-600">
+                    <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">Active Projects</p>
+                    <p class="mt-2 text-3xl font-black text-gray-900"><?= (int) ($stats['active_projects'] ?? 0) ?></p>
+                </div>
+                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                    <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6m4 6V7m4 10V4M5 20h14"></path></svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">Total Employees</p>
+                    <p class="mt-2 text-3xl font-black text-gray-900"><?= (int) ($stats['total_employees'] ?? 0) ?></p>
+                </div>
+                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+                    <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">Pending Tasks</p>
+                    <p class="mt-2 text-3xl font-black text-gray-900"><?= (int) ($stats['pending_tasks'] ?? 0) ?></p>
+                </div>
+                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+                    <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h2 class="text-lg font-bold text-gray-900">Admin Document Inbox</h2>
-                <p class="text-sm text-gray-500 mt-1">Files uploaded from BD are stored privately and only visible here for admin and owner users.</p>
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div class="mb-4">
+                <h2 class="text-xl font-black text-gray-900">Overall Project Status</h2>
             </div>
-            <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Private</span>
-        </div>
 
-        <?php if (empty($admin_documents)): ?>
-            <div class="border border-dashed border-gray-200 rounded-xl p-8 text-center">
-                <p class="text-sm font-medium text-gray-500">No BD documents have been uploaded yet.</p>
-            </div>
-        <?php else: ?>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">
-                            <th class="py-3 pr-4">Project</th>
-                            <th class="py-3 pr-4">Document</th>
-                            <th class="py-3 pr-4">Uploaded By</th>
-                            <th class="py-3 pr-4">Date</th>
-                            <th class="py-3 text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        <?php foreach ($admin_documents as $document): ?>
-                            <tr>
-                                <td class="py-4 pr-4">
-                                    <div class="font-semibold text-gray-900"><?= sanitize($document['project_name'] ?? 'General BD Document') ?></div>
-                                    <div class="text-xs text-gray-500">
-                                        <?= !empty($document['proposal_id']) ? 'Proposal #' . (int) $document['proposal_id'] : 'BD Inbox' ?>
+            <?php if (empty($chartSeries)): ?>
+                <div class="flex h-80 items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50 text-sm font-semibold text-gray-400">
+                    No project data available yet.
+                </div>
+            <?php else: ?>
+                <div class="grid gap-6 lg:grid-cols-[300px,1fr] lg:items-center">
+                    <div class="relative mx-auto h-64 w-64">
+                        <canvas id="projectStatusPieChart"></canvas>
+                        <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
+                            <p id="primaryStatusPercentage" class="text-4xl font-black text-gray-900"><?= (int) ($topStatus['percentage'] ?? 0) ?>%</p>
+                            <p id="primaryStatusLabel" class="mt-2 text-xs font-black uppercase tracking-[0.2em] text-blue-600"><?= sanitize($topStatus['label'] ?? 'Projects') ?></p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <?php foreach ($chartSeries as $seriesItem): ?>
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex items-start gap-3">
+                                    <span class="mt-1 inline-block h-3.5 w-3.5 rounded-sm" style="background-color: <?= sanitize($seriesItem['color']) ?>"></span>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-900"><?= sanitize($seriesItem['label']) ?></p>
+                                        <p class="text-sm text-gray-500"><?= (int) $seriesItem['count'] ?> Project<?= (int) $seriesItem['count'] === 1 ? '' : 's' ?> (<?= (int) $seriesItem['percentage'] ?>%)</p>
                                     </div>
-                                </td>
-                                <td class="py-4 pr-4">
-                                    <div class="font-semibold text-gray-900"><?= sanitize($document['original_name']) ?></div>
-                                    <div class="text-xs text-gray-500"><?= number_format(((int) ($document['file_size'] ?? 0)) / 1024, 1) ?> KB</div>
-                                </td>
-                                <td class="py-4 pr-4 text-sm text-gray-600">
-                                    <?= sanitize(trim(($document['first_name'] ?? '') . ' ' . ($document['last_name'] ?? ''))) ?: 'System' ?>
-                                </td>
-                                <td class="py-4 pr-4 text-sm text-gray-600"><?= date('M d, Y g:i A', strtotime($document['created_at'])) ?></td>
-                                <td class="py-4 text-right">
-                                    <a href="<?= base_url('/dashboard/downloadDocument/' . $document['id']) ?>" class="inline-flex items-center px-4 py-2 text-sm font-bold text-blue-700 bg-blue-50 border border-blue-100 rounded-lg hover:bg-blue-100 transition">
-                                        Download
-                                    </a>
-                                </td>
-                            </tr>
+                                </div>
+                            </div>
                         <?php endforeach; ?>
-                    </tbody>
-                </table>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div class="mb-4">
+                <h2 class="text-xl font-black text-gray-900">Project Update Overview</h2>
+                <p class="mt-1 text-sm text-gray-500">Projects grouped by current execution status.</p>
             </div>
-        <?php endif; ?>
+
+            <?php if (empty($chartSeries)): ?>
+                <div class="flex h-80 items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50 text-sm font-semibold text-gray-400">
+                    No project data available yet.
+                </div>
+            <?php else: ?>
+                <div class="relative h-80">
+                    <canvas id="projectStatusBarChart"></canvas>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-    
-    <div class="lg:col-span-2 bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col">
-        <div class="flex items-center justify-between mb-8">
-            <div>
-                <h2 class="text-xl font-extrabold text-gray-900 tracking-tight">Revenue Overview</h2>
-                <p class="text-xs font-bold text-gray-400 uppercase mt-1 tracking-widest">Growth Tracking (6 Months)</p>
+
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr,1fr]">
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div class="mb-4">
+                <h2 class="text-xl font-black text-gray-900">Project Updates</h2>
+                <p class="mt-1 text-sm text-gray-500">Latest project activity driven by the project records in the system.</p>
             </div>
-            <div class="bg-gray-50 px-4 py-2 rounded-xl text-xs font-black text-gray-500 border border-gray-100 cursor-pointer hover:bg-gray-100 transition">
-                Next Month ▾
-            </div>
+
+            <?php if (empty($projectUpdates)): ?>
+                <div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center text-sm font-semibold text-gray-400">
+                    No projects available to display.
+                </div>
+            <?php else: ?>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-100 text-xs uppercase tracking-[0.15em] text-gray-400">
+                                <th class="pb-3 pr-4 font-bold">Project Name</th>
+                                <th class="pb-3 pr-4 font-bold">Manager</th>
+                                <th class="pb-3 pr-4 font-bold">Status</th>
+                                <th class="pb-3 pr-4 font-bold">Progress</th>
+                                <th class="pb-3 font-bold">Last Update</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <?php foreach ($projectUpdates as $projectItem): ?>
+                                <?php
+                                $dashboardStatus = $projectItem['dashboard_status'] ?? 'in_progress';
+                                $badgeClass = $statusBadgeClasses[$dashboardStatus] ?? 'bg-gray-100 text-gray-700';
+                                $progressValue = max(0, min(100, (int) ($projectItem['progress_pct'] ?? 0)));
+                                $managerName = trim((string) ($projectItem['manager_name'] ?? ''));
+                                ?>
+                                <tr>
+                                    <td class="py-3 pr-4">
+                                        <a href="<?= base_url('/project/show/' . (int) $projectItem['id']) ?>" class="font-semibold text-gray-900 hover:text-blue-600">
+                                            <?= sanitize($projectItem['name'] ?? 'Untitled Project') ?>
+                                        </a>
+                                    </td>
+                                    <td class="py-3 pr-4 text-gray-600"><?= sanitize($managerName !== '' ? $managerName : 'Unassigned') ?></td>
+                                    <td class="py-3 pr-4">
+                                        <span class="inline-flex rounded-full px-3 py-1 text-xs font-bold <?= $badgeClass ?>">
+                                            <?= sanitize($statusLabelMap[$dashboardStatus] ?? 'In Progress') ?>
+                                        </span>
+                                    </td>
+                                    <td class="py-3 pr-4">
+                                        <div class="flex items-center gap-3">
+                                            <span class="w-10 text-xs font-bold text-gray-600"><?= $progressValue ?>%</span>
+                                            <div class="h-2 w-28 rounded-full bg-gray-100">
+                                                <div class="h-2 rounded-full <?= $dashboardStatus === 'completed' ? 'bg-green-500' : ($dashboardStatus === 'on_hold' ? 'bg-yellow-400' : ($dashboardStatus === 'at_risk' ? 'bg-orange-500' : ($dashboardStatus === 'not_started' ? 'bg-red-500' : 'bg-blue-500'))) ?>" style="width: <?= $progressValue ?>%"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-gray-600"><?= !empty($projectItem['updated_at']) ? date('M d, Y', strtotime($projectItem['updated_at'])) : 'N/A' ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </div>
-        <div class="relative h-72 w-full">
-            <canvas id="revenueChart"></canvas>
+
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div class="mb-4">
+                <h2 class="text-xl font-black text-gray-900">Status Distribution (By Projects)</h2>
+            </div>
+
+            <?php if (empty($chartSeries)): ?>
+                <div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center text-sm font-semibold text-gray-400">
+                    No status distribution available yet.
+                </div>
+            <?php else: ?>
+                <div class="space-y-5">
+                    <div class="grid grid-cols-[1.3fr,1.4fr,0.5fr,0.6fr] gap-4 border-b border-gray-100 pb-3 text-xs font-bold uppercase tracking-[0.15em] text-gray-400">
+                        <div>Status</div>
+                        <div></div>
+                        <div>Projects</div>
+                        <div>Percentage</div>
+                    </div>
+                    <?php foreach ($chartSeries as $seriesItem): ?>
+                        <div class="grid grid-cols-[1.3fr,1.4fr,0.5fr,0.6fr] items-center gap-4 text-sm">
+                            <div class="font-medium text-gray-700"><?= sanitize($seriesItem['label']) ?></div>
+                            <div class="h-2.5 rounded-full bg-gray-100">
+                                <div class="h-2.5 rounded-full" style="width: <?= (int) $seriesItem['percentage'] ?>%; background-color: <?= sanitize($seriesItem['color']) ?>"></div>
+                            </div>
+                            <div class="font-semibold text-gray-700"><?= (int) $seriesItem['count'] ?></div>
+                            <div class="font-semibold text-gray-700"><?= (int) $seriesItem['percentage'] ?>%</div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
-    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col">
-        <div class="mb-6">
-            <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">PROJECT STATUS BREAKDOWN</h2>
-            <p class="text-sm text-gray-400 font-medium mt-1">Instant view of overall project progress</p>
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1fr,1.15fr]">
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div class="mb-4">
+                <h2 class="text-xl font-black text-gray-900">System Activity</h2>
+            </div>
+
+            <?php if (empty($activities)): ?>
+                <div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center text-sm font-semibold text-gray-400">
+                    No recent activity recorded.
+                </div>
+            <?php else: ?>
+                <div class="space-y-4">
+                    <?php foreach ($activities as $log): ?>
+                        <div class="flex gap-3">
+                            <img src="<?= $log['avatar'] ?? 'https://ui-avatars.com/api/?name=' . urlencode(trim(($log['first_name'] ?? 'System') . ' ' . ($log['last_name'] ?? 'User'))) ?>" alt="User avatar" class="h-10 w-10 rounded-full border border-gray-100 object-cover">
+                            <div>
+                                <p class="text-sm text-gray-800">
+                                    <span class="font-semibold"><?= sanitize(trim(($log['first_name'] ?? '') . ' ' . ($log['last_name'] ?? ''))) ?: 'System User' ?></span>
+                                    <?= ' ' . sanitize($log['action'] ?? 'updated the dashboard') ?>
+                                </p>
+                                <p class="text-xs text-gray-500"><?= !empty($log['created_at']) ? date('M d, g:i A', strtotime($log['created_at'])) : 'N/A' ?> &middot; <?= sanitize($log['module'] ?? 'System') ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
-        
-        <div class="flex-1 flex flex-col items-center justify-center gap-10">
-            <div class="relative h-60 w-60 flex items-center justify-center">
-                <canvas id="statusDoughnutChart"></canvas>
-                <div class="absolute text-center">
-                    <p id="chart-percentage-main" class="text-5xl font-black text-gray-900 leading-none">0%</p>
-                    <p id="chart-status-main" class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mt-2">In Progress</p>
+
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div class="mb-4 flex items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-black text-gray-900">Admin Document Inbox</h2>
+                    <p class="mt-1 text-sm text-gray-500">Recent BD uploads available for admin and owner roles.</p>
                 </div>
+                <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-gray-500">Private</span>
             </div>
 
-            <div class="w-full space-y-4">
-                <div class="flex items-center justify-between group cursor-default">
-                    <div class="flex items-center gap-3">
-                        <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200"></span>
-                        <span class="text-xs font-black text-gray-600 uppercase tracking-wider">Completed</span>
-                    </div>
-                    <span class="text-sm font-black text-gray-900"><?= $stats['completed_projects'] ?? 2 ?> Projects</span>
+            <?php if (empty($adminDocuments)): ?>
+                <div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center text-sm font-semibold text-gray-400">
+                    No BD documents have been uploaded yet.
                 </div>
-                
-                <div class="flex items-center justify-between group cursor-default">
-                    <div class="flex items-center gap-3">
-                        <span class="w-3 h-3 rounded-full bg-indigo-600 shadow-sm shadow-indigo-200"></span>
-                        <span class="text-xs font-black text-gray-600 uppercase tracking-wider">In Progress</span>
-                    </div>
-                    <span class="text-sm font-black text-gray-900"><?= $stats['in_progress_projects'] ?? 4 ?> Projects</span>
+            <?php else: ?>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-100 text-xs uppercase tracking-[0.15em] text-gray-400">
+                                <th class="pb-3 pr-4 font-bold">Project</th>
+                                <th class="pb-3 pr-4 font-bold">Document</th>
+                                <th class="pb-3 pr-4 font-bold">Uploaded By</th>
+                                <th class="pb-3 pr-4 font-bold">Date</th>
+                                <th class="pb-3 text-right font-bold">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <?php foreach ($adminDocuments as $document): ?>
+                                <tr>
+                                    <td class="py-3 pr-4">
+                                        <div class="font-semibold text-gray-900"><?= sanitize($document['project_name'] ?? 'General BD Document') ?></div>
+                                        <div class="text-xs text-gray-500"><?= !empty($document['proposal_id']) ? 'Proposal #' . (int) $document['proposal_id'] : 'BD Inbox' ?></div>
+                                    </td>
+                                    <td class="py-3 pr-4">
+                                        <div class="font-semibold text-gray-900"><?= sanitize($document['original_name'] ?? 'Document') ?></div>
+                                        <div class="text-xs text-gray-500"><?= number_format(((int) ($document['file_size'] ?? 0)) / 1024, 1) ?> KB</div>
+                                    </td>
+                                    <td class="py-3 pr-4 text-gray-600"><?= sanitize(trim(($document['first_name'] ?? '') . ' ' . ($document['last_name'] ?? ''))) ?: 'System' ?></td>
+                                    <td class="py-3 pr-4 text-gray-600"><?= !empty($document['created_at']) ? date('M d, Y g:i A', strtotime($document['created_at'])) : 'N/A' ?></td>
+                                    <td class="py-3 text-right">
+                                        <a href="<?= base_url('/dashboard/downloadDocument/' . (int) $document['id']) ?>" class="inline-flex items-center rounded-lg bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 hover:bg-blue-100">
+                                            Download
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="flex items-center justify-between group cursor-default">
-                    <div class="flex items-center gap-3">
-                        <span class="w-3 h-3 rounded-full bg-rose-500 shadow-sm shadow-rose-200"></span>
-                        <span class="text-xs font-black text-gray-600 uppercase tracking-wider">On Hold</span>
-                    </div>
-                    <span class="text-sm font-black text-gray-900"><?= $stats['on_hold_projects'] ?? 1 ?> Projects</span>
-                </div>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const response = await fetch('<?= base_url('/dashboard/chartData') ?>');
-        const data = await response.json();
-        
-        const labels = data.map(item => item.month);
-        const revenues = data.map(item => item.total_income);
+document.addEventListener('DOMContentLoaded', function () {
+    const statusSeries = <?= $chartJson ?: '[]' ?>;
 
-        // Fetch PHP Constant into Javascript safely
-        const sysCurrency = '<?= defined("SYS_CURRENCY") ? SYS_CURRENCY : "$" ?>';
+    if (!Array.isArray(statusSeries) || statusSeries.length === 0) {
+        return;
+    }
 
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
+    const labels = statusSeries.map(item => item.label);
+    const values = statusSeries.map(item => Number(item.count || 0));
+    const colors = statusSeries.map(item => item.color);
+
+    const pieCanvas = document.getElementById('projectStatusPieChart');
+    if (pieCanvas) {
+        new Chart(pieCanvas.getContext('2d'), {
+            type: 'pie',
             data: {
-                labels: labels,
+                labels,
                 datasets: [{
-                    // 🚀 DYNAMIC JAVASCRIPT LABEL
-                    label: `Revenue (${sysCurrency})`,
-                    data: revenues,
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#2563eb',
-                    pointBorderWidth: 2,
-                    pointRadius: 4
+                    data: values,
+                    backgroundColor: colors,
+                    borderColor: '#ffffff',
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { borderDash: [4, 4], color: '#f3f4f6' },
-                        // 🚀 Render dynamic currency on the Y-Axis ticks
-                        ticks: {
-                            callback: function(value, index, values) {
-                                return sysCurrency + value;
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const count = context.raw || 0;
+                                const total = values.reduce((sum, value) => sum + value, 0);
+                                const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                                return `${context.label}: ${count} (${percentage}%)`;
                             }
                         }
-                    },
-                    x: { grid: { display: false } }
+                    }
                 }
             }
         });
-    } catch (error) {
-        console.error("Error loading chart data", error);
+    }
+
+    const barCanvas = document.getElementById('projectStatusBarChart');
+    if (barCanvas) {
+        new Chart(barCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Projects',
+                    data: values,
+                    backgroundColor: colors,
+                    borderRadius: 8,
+                    maxBarThickness: 48
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        },
+                        grid: {
+                            color: '#eef2f7'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
     }
 });
-// 1. REVENUE CHART CONFIG (Keeping your existing logic)
-    // ... insert your revenue chart fetch logic here ...
-
-    // 2. **PROJECT STATUS DOUGHNUT CHART**
-    const doughnutCtx = document.getElementById('statusDoughnutChart').getContext('2d');
-    
-    const completed = <?= $stats['completed_projects'] ?? 2 ?>;
-    const inProgress = <?= $stats['in_progress_projects'] ?? 4 ?>;
-    const onHold = <?= $stats['on_hold_projects'] ?? 1 ?>;
-    const total = completed + inProgress + onHold;
-
-    // Calculate percentage for the center text
-    const inProgressPercentage = total > 0 ? Math.round((inProgress / total) * 100) : 0;
-    document.getElementById('chart-percentage-main').textContent = `${inProgressPercentage}%`;
-
-    new Chart(doughnutCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Completed', 'In Progress', 'On Hold'],
-            datasets: [{
-                data: [completed, inProgress, onHold],
-                backgroundColor: [
-                    '#10b981', // emerald-500
-                    '#4f46e5', // indigo-600
-                    '#f43f5e'  // rose-500
-                ],
-                hoverOffset: 20,
-                borderWidth: 0,
-                borderRadius: 4, // Added slight rounding for a modern look
-                spacing: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '78%', // Slightly thinner for the central text space
-            plugins: { 
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#1e293b',
-                    titleFont: { size: 12, weight: 'bold', family: 'Inter' },
-                    bodyFont: { size: 12, family: 'Inter' },
-                    padding: 12,
-                    displayColors: true,
-                    cornerRadius: 8
-                }
-            },
-            animation: {
-                animateScale: true,
-                duration: 2000
-            }
-        }
-    });
-
 </script>

@@ -138,6 +138,56 @@ class Project extends Model {
         return $this->db->fetchAll();
     }
 
+    public function getAdminProjectCatalog() {
+        try {
+            $this->db->query("
+                SELECT
+                    p.*,
+                    c.company_name,
+                    u.first_name,
+                    u.last_name,
+                    u.avatar,
+                    COUNT(DISTINCT pm.user_id) AS assigned_members
+                FROM {$this->table} p
+                LEFT JOIN clients c ON p.client_id = c.id
+                LEFT JOIN users u ON p.project_manager_id = u.id
+                LEFT JOIN project_members pm ON p.id = pm.project_id
+                GROUP BY
+                    p.id, p.client_id, p.currency_id, p.project_manager_id, p.name, p.description,
+                    p.status, p.priority, p.estimated_budget, p.total_hours, p.start_date, p.deadline,
+                    p.progress_pct, p.created_at, p.updated_at, p.project_code,
+                    c.company_name, u.first_name, u.last_name, u.avatar
+                ORDER BY p.created_at DESC, p.id DESC
+            ");
+            return $this->db->fetchAll() ?: [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getAdminProjectDetails($project_id) {
+        try {
+            $this->db->query("
+                SELECT
+                    p.*,
+                    c.company_name,
+                    u.first_name AS manager_first_name,
+                    u.last_name AS manager_last_name,
+                    u.email AS manager_email,
+                    u.avatar AS manager_avatar
+                FROM {$this->table} p
+                LEFT JOIN clients c ON p.client_id = c.id
+                LEFT JOIN users u ON p.project_manager_id = u.id
+                WHERE p.id = :pid
+                LIMIT 1
+            ");
+            $this->db->bind(':pid', $project_id);
+            return $this->db->fetch() ?: [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
     /** * Fetches all active personnel to be assigned to the project
      * ELITE FIX: Guaranteed 'email' and 'role_id' columns
      */
@@ -149,6 +199,216 @@ class Project extends Model {
             ORDER BY first_name ASC
         ");
         return $this->db->fetchAll();
+    }
+
+    public function getProjectForManager($project_id, $manager_id, $role_slug = 'pm') {
+        try {
+            if (in_array($role_slug, ['owner', 'admin'], true)) {
+                $this->db->query("
+                    SELECT
+                        p.*,
+                        c.company_name,
+                        u.first_name AS manager_first_name,
+                        u.last_name AS manager_last_name
+                    FROM {$this->table} p
+                    LEFT JOIN clients c ON p.client_id = c.id
+                    LEFT JOIN users u ON p.project_manager_id = u.id
+                    WHERE p.id = :pid
+                    LIMIT 1
+                ");
+                $this->db->bind(':pid', $project_id);
+            } else {
+                $this->db->query("
+                    SELECT
+                        p.*,
+                        c.company_name,
+                        u.first_name AS manager_first_name,
+                        u.last_name AS manager_last_name
+                    FROM {$this->table} p
+                    LEFT JOIN clients c ON p.client_id = c.id
+                    LEFT JOIN users u ON p.project_manager_id = u.id
+                    WHERE p.id = :pid AND p.project_manager_id = :pm_id
+                    LIMIT 1
+                ");
+                $this->db->bind(':pid', $project_id);
+                $this->db->bind(':pm_id', $manager_id);
+            }
+
+            return $this->db->fetch() ?: [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function removeMember($project_id, $user_id) {
+        try {
+            $this->db->query("DELETE FROM project_members WHERE project_id = :pid AND user_id = :uid");
+            $this->db->bind(':pid', $project_id);
+            $this->db->bind(':uid', $user_id);
+            return $this->db->execute();
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    public function updateMemberAllocation($project_id, $user_id, $allocated_hours = 0) {
+        try {
+            $this->ensureResourceColumns();
+            $this->db->query("
+                UPDATE project_members
+                SET allocated_hours = :allocated_hours
+                WHERE project_id = :pid AND user_id = :uid
+            ");
+            $this->db->bind(':allocated_hours', max(0, (float) $allocated_hours));
+            $this->db->bind(':pid', $project_id);
+            $this->db->bind(':uid', $user_id);
+            return $this->db->execute();
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    public function updateProjectPlanningMeta($project_id, $data) {
+        try {
+            $fields = [];
+            $bindings = [':pid' => $project_id];
+
+            if (array_key_exists('start_date', $data)) {
+                $fields[] = 'start_date = :start_date';
+                $bindings[':start_date'] = !empty($data['start_date']) ? $data['start_date'] : null;
+            }
+
+            if (array_key_exists('deadline', $data)) {
+                $fields[] = 'deadline = :deadline';
+                $bindings[':deadline'] = !empty($data['deadline']) ? $data['deadline'] : null;
+            }
+
+            if (array_key_exists('priority', $data)) {
+                $fields[] = 'priority = :priority';
+                $bindings[':priority'] = !empty($data['priority']) ? strtolower((string) $data['priority']) : 'medium';
+            }
+
+            if (empty($fields)) {
+                return true;
+            }
+
+            $this->db->query("UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = :pid");
+            foreach ($bindings as $key => $value) {
+                $this->db->bind($key, $value);
+            }
+
+            return $this->db->execute();
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    public function getDepartmentMemberPool($project_id, array $departments = []) {
+        $pool = [];
+
+        foreach ($departments as $department) {
+            $department = trim((string) $department);
+            if ($department === '') {
+                continue;
+            }
+
+            try {
+                $this->db->query("
+                    SELECT
+                        u.id,
+                        u.first_name,
+                        u.last_name,
+                        u.email,
+                        u.status,
+                        u.avatar,
+                        COALESCE(pm.allocated_hours, 0) AS allocated_hours,
+                        CASE WHEN pm.user_id IS NULL THEN 0 ELSE 1 END AS is_assigned
+                    FROM users u
+                    LEFT JOIN project_members pm
+                        ON pm.user_id = u.id
+                        AND pm.project_id = :project_id
+                    WHERE u.status = 'active'
+                        AND LOWER(TRIM(COALESCE(u.department, ''))) = :department
+                    ORDER BY pm.user_id IS NOT NULL DESC, u.first_name ASC, u.last_name ASC
+                ");
+                $this->db->bind(':project_id', $project_id);
+                $this->db->bind(':department', strtolower($department));
+                $members = $this->db->fetchAll();
+            } catch (Exception $e) {
+                $members = [];
+            }
+
+            $pool[$department] = array_map(function ($member) {
+                $firstName = trim((string) ($member['first_name'] ?? ''));
+                $lastName = trim((string) ($member['last_name'] ?? ''));
+                $fullName = trim($firstName . ' ' . $lastName);
+                $initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
+
+                return [
+                    'id' => (int) ($member['id'] ?? 0),
+                    'name' => $fullName !== '' ? $fullName : 'Team Member',
+                    'initials' => $initials !== '' ? $initials : 'TM',
+                    'current_status' => !empty($member['is_assigned']) ? 'Active' : 'Available',
+                    'hourly_capacity' => (float) ($member['allocated_hours'] ?? 0) > 0 ? (float) $member['allocated_hours'] : 16,
+                    'is_assigned' => !empty($member['is_assigned']),
+                    'email' => $member['email'] ?? '',
+                    'avatar' => $member['avatar'] ?? null,
+                ];
+            }, $members);
+        }
+
+        return $pool;
+    }
+
+    public function syncResourcePlanAssignments($project_id) {
+        try {
+            $plan = $this->getResourcePlan($project_id);
+            $rows = $plan['rows'] ?? [];
+            if (empty($rows)) {
+                return true;
+            }
+
+            $departments = array_values(array_filter(array_map(
+                fn($row) => trim((string) ($row['department'] ?? '')),
+                $rows
+            )));
+
+            if (empty($departments)) {
+                return true;
+            }
+
+            $this->db->query("
+                SELECT LOWER(TRIM(COALESCE(u.department, ''))) AS department_key, COUNT(*) AS assigned_count
+                FROM project_members pm
+                INNER JOIN users u ON u.id = pm.user_id
+                WHERE pm.project_id = :project_id
+                GROUP BY LOWER(TRIM(COALESCE(u.department, '')))
+            ");
+            $this->db->bind(':project_id', $project_id);
+            $countsRaw = $this->db->fetchAll();
+
+            $assignedCounts = [];
+            foreach ($countsRaw as $countRow) {
+                $assignedCounts[$countRow['department_key']] = (int) ($countRow['assigned_count'] ?? 0);
+            }
+
+            $updatedRows = [];
+            foreach ($rows as $row) {
+                $departmentKey = strtolower(trim((string) ($row['department'] ?? '')));
+                $row['assigned_employees'] = $assignedCounts[$departmentKey] ?? 0;
+                $updatedRows[] = $row;
+            }
+
+            return $this->saveResourcePlan($project_id, [
+                'project_manager_label' => $plan['project_manager_label'] ?? '',
+                'start_date' => $plan['start_date'] ?? null,
+                'end_date' => $plan['end_date'] ?? null,
+                'priority' => $plan['priority'] ?? 'medium',
+                'plan_status' => $plan['plan_status'] ?? 'draft',
+            ], $updatedRows, (int) ($_SESSION['user_id'] ?? 0));
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     public function createProject($data) {

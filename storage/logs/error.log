@@ -5295,3 +5295,151 @@ Stack trace: #0 C:\xampp\htdocs\project-root\app\views\projects\view.php(335): E
 #6 {main}
 Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 335
 
+[2026-04-22 16:52:26] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:52:27] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:52:28] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:52:28] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:52:28] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:52:30] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:52:30] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:52:31] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:52:31] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:52:31] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:52:31] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:52:37] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('9')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 16:53:25] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getProjectForManager()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('7')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 241
+
+[2026-04-22 18:13:12] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getAvailableResources()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('7')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 248
+
+[2026-04-22 18:13:20] Uncaught Exception: 'Error'
+Message: 'Call to undefined method Project::getAvailableResources()'
+Stack trace: #0 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('7')
+#1 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#2 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\controllers\ProjectController.php' on line 248
+
+[2026-04-22 18:14:14] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected identifier "INSERT", expecting ")"'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\controllers\PmController.php(16): Controller->model('Project')
+#1 C:\xampp\htdocs\project-root\core\App.php(44): PmController->dashboard()
+#2 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#3 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\models\Project.php' on line 211
+
+[2026-04-22 18:14:14] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected identifier "INSERT", expecting ")"'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\controllers\PmController.php(16): Controller->model('Project')
+#1 C:\xampp\htdocs\project-root\core\App.php(44): PmController->dashboard()
+#2 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#3 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\models\Project.php' on line 211
+
+[2026-04-22 18:14:14] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected identifier "INSERT", expecting ")"'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\controllers\PmController.php(16): Controller->model('Project')
+#1 C:\xampp\htdocs\project-root\core\App.php(44): PmController->dashboard()
+#2 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#3 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\models\Project.php' on line 211
+
+[2026-04-22 18:14:15] Uncaught Exception: 'ParseError'
+Message: 'syntax error, unexpected identifier "INSERT", expecting ")"'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\controllers\PmController.php(16): Controller->model('Project')
+#1 C:\xampp\htdocs\project-root\core\App.php(44): PmController->dashboard()
+#2 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#3 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\models\Project.php' on line 211
+
+[2026-04-25 14:50:26] Uncaught Exception: 'ErrorException'
+Message: 'Undefined variable $estimatedHours'
+Stack trace: #0 C:\xampp\htdocs\project-root\app\views\projects\view.php(491): ErrorHandler::handleError(2, 'Undefined varia...', 'C:\\xampp\\htdocs...', 491)
+#1 C:\xampp\htdocs\project-root\app\views\layouts\main.php(240): require_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\project-root\core\Controller.php(31): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\project-root\app\controllers\ProjectController.php(258): Controller->view('layouts/main', Array)
+#4 C:\xampp\htdocs\project-root\core\App.php(44): ProjectController->show('8')
+#5 C:\xampp\htdocs\project-root\public\index.php(48): App->__construct()
+#6 {main}
+Thrown in 'C:\xampp\htdocs\project-root\app\views\projects\view.php' on line 491
+
